@@ -67,6 +67,14 @@
 					</view>
 				</view>
 
+				<view class="list-wrap mt20">
+					<view class="list-row" @click="toReturnPage(true)" >
+						<image class="row-image" src="/static/icon-yuqi-details.png" />
+						<text class="row-content">提前归还</text>
+						<image class="row-right" src="/static/ic_arrow_right.png" />
+					</view>
+				</view>
+				
 				<div class="coloum-container mrg-top-20 bg-white" style="padding:0px 30upx;margin-bottom: 50upx;">
 					<div style="height: 1px;width: 690upx;background: #F8F8F8;margin-bottom: 30upx;"></div>
 					<div class="row-container text-black" style="height: 80upx;font-size: 32upx;">
@@ -290,12 +298,10 @@
 				uni.showLoading({
 					title: '加载中'
 				});
-				console.log('billKey:' + self.billKey);
 				this.$Phttp.get(Config.REQUEST_URLS.getBillResult, {
 						billKey: self.billKey
 					})
 					.then(res => {
-						console.log("初始化页面数据-->" + JSON.stringify(res));
 						res = res.data;
 						if (res.code === 200) {
 							self.pageObject = res.data;
@@ -381,10 +387,8 @@
 					userKey: self.userKey,
 					payModel: '2'
 				};
-				console.log('请求参数：' + self.payType);
 				this.$Phttp.post(Config.REQUEST_URLS.executeBillResult, params)
 					.then(res => {
-						console.log('返回结果：' + JSON.stringify(res));
 						if (res.data.code === 200) {
 							console.log('我要开始开始支付--》');
 
@@ -505,7 +509,7 @@
 			toReturnPage(returnType) {
 				uni.navigateTo({
 					url: '/pkChaoYueZu/repayment/goodsReturn?orderKey=' + this.orderKey + '&userKey=' + this
-						.userKey + '&returnType=' + returnType
+						.userKey + '&returnType=' + returnType 
 				})
 			}
 		}

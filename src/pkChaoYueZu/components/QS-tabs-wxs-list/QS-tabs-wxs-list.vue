@@ -345,7 +345,7 @@
 			},
 			setTabs(arr) {
 				const fn = () => {
-					console.log(arr)
+					//console.log(arr)
 					this.tabs = arr;
 					this.initStatus = new Array(arr.length);
 					this.$nextTick(() => { //H5需要nextTick后能拿到布局信息
@@ -388,9 +388,8 @@
 				slide,
 				refresh
 			} = {}) {
-				console.log('123')
 				if (index === undefined) index = 0;
-				console.log(this.$refs[this.refPre])
+				//console.log(this.$refs[this.refPre])
 				const ref = this.$refs[this.refPre][index];
 				if (ref) {
 					const initFn = ref[this.initFnName];
@@ -399,10 +398,10 @@
 						this.initStatus[index] = true;
 						initFn(refresh);
 					} else {
-						console.log(this.initFnName + 'not a function');
+						//console.log(this.initFnName + 'not a function');
 					}
 				} else {
-					console.log('not find ref or init function');
+					//console.log('not find ref or init function');
 				}
 				return
 				try {
@@ -429,14 +428,14 @@
 							this.initStatus[index] = true;
 							initFn(refresh);
 						} else {
-							console.log(this.initFnName + 'not a function');
+							//console.log(this.initFnName + 'not a function');
 						}
 					} else {
-						console.log('not find ref or init function');
+						//console.log('not find ref or init function');
 					}
 				} catch (e) {
 					//TODO handle the exception
-					console.log('_doInit方法异常:' + JSON.stringify(e));
+					//console.log('_doInit方法异常:' + JSON.stringify(e));
 				}
 			},
 			_getDefCurrent() {

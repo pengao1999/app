@@ -70,7 +70,7 @@
 			}
 		},
 		onLoad(options) {
-			console.log(options)
+			//console.log(options)
 			this.userKey = options.userKey;
 			this.orderKey = options.orderKey;
 			options.returnType ? this.returnType = 1 : this.returnType = null
@@ -109,10 +109,9 @@
 					title: '加载中...'
 				})
 
-				console.log('提交参数：' + JSON.stringify(params));
 
 				this.$Phttp.post(Config.REQUEST_URLS.getReturnInfo, params).then(res => {
-					console.log('返回结果：' + JSON.stringify(res));
+					//console.log('返回结果：' + JSON.stringify(res));
 					uni.hideLoading();
 					if (res.data.code === 200) {
 
@@ -132,12 +131,14 @@
 						show: true,
 						desc: '请填写快递单号~'
 					})
+					return false;
 				}
 				if (!self.expressMei) {
 					self.errorData = Object.assign({}, self.errorData, {
 						show: true,
 						desc: '请填写快递单MEI码~'
 					})
+					return false;
 				}
 
 				let params = {
@@ -152,10 +153,8 @@
 					title: '提交中...'
 				})
 
-				console.log('提交参数：' + JSON.stringify(params));
 
 				this.$Phttp.post(Config.REQUEST_URLS.executeReturn, params).then(res => {
-					console.log('返回结果：' + JSON.stringify(res));
 					uni.hideLoading();
 					if (res.data.code === 200) {
 						uni.showToast({

@@ -501,7 +501,6 @@
 		}
 		// html = html.replace(/<p>/, '<p style="">').replace(/<p(.*?)style=[\'\"](.*?)[\'\"]/g, `<p $1 style="$2;max-width:100%;background:#333;"`)
 
-		// console.log(html)
 		return html
 	}
 
@@ -623,7 +622,6 @@
 			uniNumberBox
 		},
 		onLoad(options) {
-			console.log(options)
 			let self = this;
 			uni.setNavigationBarTitle({
 				title: "商品详情"
@@ -653,7 +651,6 @@
 				handler() {
 					if (!Util.isEmptyObject(this.systemInfo)) {
 						this.windowHeight = this.systemInfo.windowHeight;
-						console.log("windowHeight:" + this.windowHeight);
 					}
 				}
 			}
@@ -670,14 +667,12 @@
 			}
 		},
 		mounted() {
-			console.log(this.goods)
 		},
 		methods: {
 			...mapMutations(['setUserInfo']),
 			getAd() {
 				let self = this
 				self.$Phttp.post(Config.JAVA_SAAS_URLS.getAds, {}).then(res => {
-					console.log(res)
 					res = res.data
 					if (res.code === 0) {
 						let goodBanner = res.data.goodBanner
@@ -690,7 +685,6 @@
 							banner.originalPic = imageUrl
 							self.banner = banner
 						}
-						console.log(self.banner)
 					}
 				})
 			},
@@ -713,11 +707,9 @@
 				self.$Phttp.get(Config.JAVA_SAAS_URLS.getAssociation, param).then(res => {
 					res = res.data
 					if (res.code === 0) {
-						console.log('data', res.data)
 						self.associations = res.data || []
 					}
 					uni.hideLoading();
-					console.log(self.associations, 'associations')
 				})
 			},
 			hideSku() {
@@ -742,14 +734,12 @@
 								}
 							}
 						})
-						console.log('obj', self.collectionObj)
 					}
 				})
 			},
 			getContact() {
 				let self = this
 				self.$Phttp.post(Config.JAVA_SAAS_URLS.getContact, {}).then(res => {
-					console.log(res)
 					res = res.data
 					if (res.code === 0) {
 						self.contactPhone = res.msg
@@ -772,7 +762,6 @@
 					article_key: article_key
 				}
 				self.$Phttp.post(Config.JAVA_SAAS_URLS.getArticle, data).then((res) => {
-					console.log(res)
 					res = res.data
 					self.zulinbidu = htmlBeautify(res.data.content)
 				})
@@ -787,10 +776,8 @@
 					goods_key: good_key
 				};
 				self.$Phttp.post(Config.JAVA_SAAS_URLS.getGoods, data).then(res => {
-						console.log(res, '747')
 						self.toast(true);
 						// #ifdef MP-ALIPAY 
-						console.log('123456')
 						uni.hideLoading()
 						// #endif 
 						res = res.data;
@@ -835,7 +822,6 @@
 							}
 							let ifChooseobj = []
 							self.goods.prefers.forEach((item, index) => {
-								console.log(index)
 								let obj = {}
 								if (index == 0) {
 									obj.index = 0
@@ -846,13 +832,10 @@
 								}
 							})
 							self.ifChoose = ifChooseobj
-							console.log(self.goods, 'goods')
 							// self.specifications = res.data.attrgroups
-							// console.log('spec', self.specifications)
 						}
 					})
 					.catch(err => {
-						console.log(err)
 						uni.showModal({
 							title: "温馨提示",
 							content: "抱歉，获取商品详情失败，请检查网络！",
@@ -883,7 +866,6 @@
 					specific_template_key: templateKey
 				}
 				self.$Phttp.post(Config.JAVA_SAAS_URLS.getSkuList, postData).then(res => {
-					console.log(res)
 					res = res.data
 					if (res.code === 0) {
 						self.difference = res.data
@@ -976,7 +958,6 @@
 						let zuqiValue = ""
 						let preferJson = []
 						self.ifChoose.forEach((item, index) => {
-							console.log(item)
 							if (item.index >= 0) {
 								preferJson.push(self.goods.prefers[item.index])
 							}
@@ -1009,8 +990,6 @@
 							self.goods.pic = self.colors[self.colorIndex].pic
 							self.goods.attr_names += " " + self.colors[self.colorIndex].name
 						}
-						console.log(this.goods)
-						console.log(this.cAttr)
 						uni.setStorageSync("goods", self.goods);
 						uni.setStorageSync("image_root", self.image_root);
 						uni.setStorageSync('cAttr', self.cAttr);
@@ -1168,11 +1147,9 @@
 					target_key: self.key,
 					user_key: self.userInfo.user_key
 				}
-				console.log('data', data)
 				self.$Phttp.post(Config.JAVA_SAAS_URLS.upsertCollection, data).then(res => {
 					res = res.data
 					if (res.code === 0) {
-						console.log(res.data)
 						self.collectionObj = {
 							isCollected: true,
 							collectKey: res.data.collect_key,
@@ -1194,7 +1171,6 @@
 				})
 			},
 			checkItem() {
-				console.log('计算有多小种可选路径需要的时间是');
 				//计算有多小种可选路径
 				let result = this.difference.reduce(
 					(arrs, items) => {
@@ -1221,12 +1197,9 @@
 						[]
 					]
 				);
-				console.log(this.shopItemInfo)
 				// console.timeEnd('计算有多小种可选路径需要的时间是');
 			},
 			checkInpath(clickIndex) {
-				console.log(clickIndex)
-				console.log(this.specifications.length)
 				// console.time('筛选可选路径需要的时间是');
 				//循环所有属性判断哪些属性可选
 				//当前选中的兄弟节点和已选中属性不需要循环
@@ -1236,7 +1209,6 @@
 						continue;
 					}
 					let len2 = this.specifications[i].item.length;
-					console.log(len2)
 					for (let j = 0; j < len2; j++) {
 						if (this.subIndex[i] != -1 && j == this.subIndex[i]) {
 							continue;
@@ -1244,7 +1216,6 @@
 						let choosed_copy = [...this.selectArr];
 						this.$set(choosed_copy, i, this.specifications[i].item[j].name);
 						let choosed_copy2 = choosed_copy.filter(item => item !== '' && typeof item !== 'undefined');
-						console.log(choosed_copy2)
 						if (this.shopItemInfo.hasOwnProperty(choosed_copy2)) {
 							this.$set(this.specifications[i].item[j], 'ishow', true);
 						} else {
@@ -1252,7 +1223,6 @@
 						}
 					}
 				}
-				console.log(this.specifications, 'specifications')
 				// console.timeEnd('筛选可选路径需要的时间是');
 			},
 			moveHandle() {
@@ -1260,16 +1230,10 @@
 			},
 			chooseDefault() {
 				let self = this
-				console.log(self.specifications)
 				let difference = self.difference[0].difference
-				console.log(difference)
-				console.log("difference:" + JSON.stringify(difference) + ",specifications:" + self.specifications.length)
 				self.specifications.forEach((type, tIndex) => {
 					type.item.forEach((attr, aIndex) => {
-						console.log(attr)
-						console.log(aIndex)
 						if (difference[tIndex] === attr.name) {
-							// console.log("click:" + JSON.stringify(attr))
 							self.skuClick(attr, tIndex, null, aIndex)
 						}
 					})
@@ -1296,32 +1260,22 @@
 				}
 			},
 			skuClick(value, index1, event, index2) {
-				console.log(value, index1, index2)
 				if (value.ishow) {
 					if (this.selectArr[index1] != value.name) {
-						console.log('进1了')
 						this.$set(this.selectArr, index1, value.name);
 						this.$set(this.subIndex, index1, index2);
 					} else {
-						console.log('进2了')
 						this.$set(this.selectArr, index1, '');
 						this.$set(this.subIndex, index1, -1);
 					}
 					if (value.periods) {
 						this.periodsConfig.periods = value.periods
 						this.periodsConfig.unit = this.parseUnit(value.unit)
-						console.log(this.periodsConfig)
 					}
-					console.log(this.periodsConfig, 'periodsConfig')
 					this.checkInpath(index1);
 					//如果全部选完
-					console.log(this.selectArr);
 					if (this.selectArr.every(item => item != '')) {
-						console.log("selectArr")
-						console.log(this.shopItemInfo)
-						console.log(this.selectArr)
 						this.selectshop = this.shopItemInfo[this.selectArr];
-						console.log(this.selectshop, 'selectshop')
 						if (this.selectshop.origin_price === null) {
 							this.selectshop.origin_price = 0
 						}
@@ -1338,7 +1292,6 @@
 					key: key
 				}
 				self.$Phttp.post(Config.JAVA_SAAS_URLS.getTemplate, postData).then(res => {
-					console.log(res.data)
 					res = res.data
 					if (res.code === 0) {
 						self.specifications = res.data
@@ -1346,10 +1299,7 @@
 							this.selectArr.push('');
 							this.subIndex.push(-1);
 						});
-						console.log(this.selectArr)
-						console.log(this.subIndex)
 						if (self.difference.length > 0) {
-							console.log('这里');
 							self.checkItem(); //计算sku里面规格形成路径
 							self.checkInpath(-1); //传-1是为了不跳过循环
 							self.chooseDefault();
@@ -1386,7 +1336,6 @@
 			
 			//组件样式不生效
 			_calcValue(type) {
-				console.log('点击事件生效')
 				if (this.disabled) {
 					return;
 				}
@@ -1394,7 +1343,6 @@
 				let value = this.selectNum * scale;
 				let step = this.step * scale;
 				if (type === "minus") {
-					console.log('1')
 					if(this.selectNum == 1){
 						return
 					}
@@ -1406,7 +1354,6 @@
 						value = this.selectshop.stock * scale
 					}
 				} else if (type === "plus") {
-					console.log('2')
 					if(this.selectNum == this.selectshop.stock){
 						return
 					}

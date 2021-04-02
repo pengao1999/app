@@ -3,7 +3,7 @@ import store from '../../store'
 import Toast from '../../common/js/toast.js'
 module.exports = {
 	post: function(url, data, header, cache = false) {
-		console.log(url)
+		//console.log(url)
 		data = Object.assign(data, {
 			app_key: "123",
 			is_register: store.state.isRegister,
@@ -32,7 +32,7 @@ module.exports = {
 					}
 				},
 				fail: function(e) {
-					console.log('fail:' + JSON.stringify(e))
+					//console.log('fail:' + JSON.stringify(e))
 					uni.showToast({
 						title: '网络异常～',
 						image: '',
@@ -55,7 +55,7 @@ module.exports = {
 		})
 	},
 	get: function(url, data, header, cache = false) {
-		console.log(url, data)
+		//console.log(url, data)
 		header = header || 'application/x-www-form-urlencoded'
 		return new Promise((succ, error) => {
 			uni.request({

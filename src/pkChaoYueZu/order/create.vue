@@ -434,19 +434,15 @@
 			},
 			preferJsonmoney() {
 				let preferJsonmoney = 0
-				console.log(this, '425')
 				if (this.goodses[0].preferJson && this.goodses[0].preferJson.length > 0) {
-					console.log('426')
 					this.goodses[0].preferJson.forEach((item, index) => {
 						preferJsonmoney += item.price
 					})
 				}
-				console.log(preferJsonmoney, '430')
 				return preferJsonmoney
 			}
 		},
 		onLoad(options) {
-			console.log(options)
 			if (options.dims) {
 				this.dims = options.dims
 			}
@@ -472,8 +468,8 @@
 					user_key: self.userInfo.bind_leader,
 					name: self.userInfo.community_name,
 					address: self.userInfo.community_address,
-				}), //配送方式为自提时，自提点的信息
-				console.log(JSON.stringify(self.userInfo))
+				})//配送方式为自提时，自提点的信息
+				
 			})
 			self.getTrialBalance()
 		},
@@ -481,7 +477,6 @@
 		onShow() {
 			let self = this
 			// temp solution
-			// console.log('set uid: 1199528476659490817')
 			// self.setUserInfo({uid: '1199528476659490817'})
 
 			// self.getUserInfo()
@@ -532,7 +527,6 @@
 				}
 				this.show = true
 				this.goodses = e
-				console.log(this.goodses, '492')
 				this.goodses.forEach((item, index) => {
 					if (item.attr_names.indexOf('一元买断') !== -1) {
 						this.isactive = false
@@ -550,13 +544,11 @@
 				this.goodses.forEach((good, index) => {
 					// self.getStage(good.goods_id, good.version)
 				})
-				console.log(this.goodses, 'goodses')
 				this.goodses.forEach((item, index) => {
 					if (item.attr_names.indexOf('一口价') !== -1) {
 						this.isoneprice = true
 					}
 				})
-				console.log(this.isoneprice)
 				const cAttr = uni.getStorageSync('cAttr')
 				this.cAttr = cAttr
 
@@ -578,7 +570,6 @@
 					if (res.code === 200) {
 						self.creditAmount = ((res.data.creditAmount - res.data.freezeAmount - res.data.frozenAmount) / 100).toFixed(2)
 					}
-					console.log(self.creditAmount, 'creditAmount')
 				})
 			},
 			parseSpecificCode(periodsCode) {
@@ -594,7 +585,6 @@
 						self.getTotalPrice()
 					}
 				})
-				console.log(self.rentOrderPeroid, 'rentOrderPeroid')
 			},
 			getPeriodSetting(code) {
 				let self = this
@@ -608,7 +598,6 @@
 						self.rentTime.end = res.data.rentEndDate
 					}
 				})
-				console.log(self.rentTime, 'rentTime')
 			},
 			parseUnit(unit) {
 				switch (unit) {
@@ -629,11 +618,9 @@
 				//   userKey: self.userInfo.user_key
 				// }
 				// self.$Phttp.post(Config.XINYONG_URLS.getTrialBalance, postData, "application/json").then(res => {
-				//   console.log(res)
 				// })
 			},
 			radioChange: function(e) {
-				console.log(e);
 				this.payType = e.target.value
 			},
 			selectAttr: function(i, name, k, v) {
@@ -678,7 +665,6 @@
 						self.delivery_fee = parseFloat(res.msg) || 0
 					}
 				})
-				console.log(self.delivery_fee, 'delivery_fee')
 			},
 			getConfig: function() {
 				let self = this
@@ -884,17 +870,12 @@
 				let pamount;
 				let preferJsonmoney = 0;
 				if (self.goodses[0].preferJson && self.goodses[0].preferJson.length > 0) {
-					console.log('jinlaile')
 					self.goodses[0].preferJson.forEach((item, index) => {
-						console.log(item, '977item')
 						preferJsonmoney += item.price
 					})
 				}
-				console.log(preferJsonmoney, '867')
 				let preferJsonmoneycopy = (self.goodses[0].rent_type == 0 ? preferJsonmoney : (preferJsonmoney / self.rentOrderPeroid
 					.periods) * self.goodses[0].num)
-				console.log(self.goodses[0].rent_type)
-				console.log(preferJsonmoneycopy, 'preferJsonmoneycopy')
 				if (!self.isactive) {
 					pamount = 1
 				} else if (self.isoneprice) {
@@ -905,7 +886,6 @@
 						parseFloat(
 							self.getCreditCutAmount())
 				}
-				console.log(pamount)
 				let prefer_amountcopy;
 				if (self.goodses[0].rent_type !== null && self.goodses[0].rent_type == 1) {
 					prefer_amountcopy = (preferJsonmoney / self.rentOrderPeroid.periods) * self.goodses[0].num
@@ -942,8 +922,6 @@
 					prefer_json: JSON.stringify(self.goodses[0].preferJson && self.goodses[0].preferJson.length ? self.goodses[0].preferJson :
 						[])
 				}
-				console.log(data, '918data')
-				console.log("isForce:" + isForce)
 				if (!isForce) {
 					self.payDialog = true
 					self.isPayIng = false
@@ -957,9 +935,7 @@
 						order_type: 2,
 					})
 				}
-				console.log(self.payType);
 				// #ifdef APP-PLUS
-				console.log('payType', self.payType)
 				if (self.payType === 'alih5pay') {
 					data.payment_type = 'alipay'
 					data.pay_type = 2
@@ -1005,7 +981,6 @@
 					rent_type: self.cost_money > 0 ? "BUYOUT" : "NORMAL",
 					sku_goods_price: parseInt(self.skuGoodsPrice) * 100
 				}
-				console.log(rentInfoVO, 'skuprice')
 
 				let orderGoodsList = []
 				self.goodses.forEach((good, gIndex) => {
@@ -1041,10 +1016,8 @@
 				// if(this.goodses[0].name.indexOf("成为校园")!=-1){
 				// 	data.is_collected=0;
 				// }
-				console.log(postData2)
 				self.$Phttp.post(Config.JAVA_SAAS_URLS.addOrder, postData2).then(res => {
 					res = res.data
-					console.log(res)
 					self.toast(true)
 					if (res.code === 0) {
 						// if(this.goodses[0].name.indexOf("成为校园")==-1){
@@ -1087,13 +1060,11 @@
 					latitude: parseFloat(this.group.latitude),
 					longitude: parseFloat(this.group.longitude),
 					success: () => {
-						console.log('open map.')
 					},
 				})
 			},
 			testApp: function(url) {
 				let self = this
-				console.log(url)
 				var timeout,
 					t = 1000,
 					hasApp = true
@@ -1141,7 +1112,6 @@
 				let self = this
 				let data = {}
 				self.$http.post(Config.URLS.getDefaultLeader, data).then(res => {
-					console.log(res)
 					res = res.data
 					self.delivery_store = Object.assign(self.delivery_store, res.data)
 				})
@@ -1188,7 +1158,6 @@
 				// self.$http.post(Config.URLS.couponsInOrder, data).then((res) => {
 				// 	res = res.data
 				// 	if (res.code === 0) {
-				// 		console.log(res)
 				// 		self.couponLength = res.data.length
 				// 		self.coupons = res.data
 				// 	}
@@ -1203,7 +1172,6 @@
 				this.getTotalPrice()
 			},
 			CheckboxChange: function(e) {
-				console.log(e);
 			},
 			// 优惠券相关
 			switchDeliveryPlan: function(key) {
@@ -1228,7 +1196,6 @@
 			},
 			generatePlan: function() {
 				let self = this
-				console.log('generatePlan')
 				self.goodses[self.deliveryIndex] = Object.assign(self.goodses[self.deliveryIndex], {
 					plan: self.deliveryPlan,
 					mode: self.deliveryKey,

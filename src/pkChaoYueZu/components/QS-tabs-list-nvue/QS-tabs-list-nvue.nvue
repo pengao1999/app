@@ -554,7 +554,7 @@
 			setScrollLeft(current) {
 				const currentTab = this.tabsInfo[current];
 				if (currentTab) {
-					console.log("currentTab.left:"+currentTab.left+",currentTab.width / 2"+currentTab.width / 2+",this.compontWidth / 2:" + this.compontWidth / 2)
+					//console.log("currentTab.left:"+currentTab.left+",currentTab.width / 2"+currentTab.width / 2+",this.compontWidth / 2:" + this.compontWidth / 2)
 					this.scrollLeft = currentTab.left + currentTab.width / 2 - this.compontWidth / 6;
 				}
 			},

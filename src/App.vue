@@ -18,18 +18,16 @@
 			}
 		},
 		onLaunch: function(options) {
-			console.log(options)
+			//console.log(options)
 			let self = this
 			let version = uni.getStorageSync("version") || -1
 			version = parseInt(version)
-			console.log('123')
 			// #ifndef MP-ALIPAY
 			if (options.query.uuid) {
 				this.setOpUuid(options.query.uuid)
 			}
 			// #endif
 
-			console.log('456')
 			this.setPointToken(this.$cache.get('point_token', '') ? this.$cache.get('point_token', '') : '')
 			// #ifndef MP-ALIPAY
 			if (options.query.token) {
@@ -74,14 +72,13 @@
 			this.setTryGetUserInfo(true)
 			// #endif
 			// TODO: other plat
-			console.log('App Launch')
 
 			// #ifdef APP-PLUS 
 
 			//收到透传消息  
 			//只有APP在线时，才会触发receive事件，透传消息不会触发系统消息,需要创建本地消息  
 			plus.push.addEventListener("receive", function(msg) {
-				console.log("(receive):" + JSON.stringify(msg));
+				//console.log("(receive):" + JSON.stringify(msg));
 				if (plus.os.name == "iOS") { //如果是IOS  
 					var payload = msg.payload;
 					//【APP离线】收到消息，但没有提醒（发生在一次收到多个离线消息时，只有一个有提醒，但其他的没有提醒）  
@@ -120,7 +117,7 @@
 			//【APP在线】，收到透传消息通过，不会提醒至通知栏目，需要发送本地消息，再进行点击触发的点击事件。  
 			//【APP离线】，收到离线透传消息，必须通过Java后台的Intent字符串携带payload，且符合格式才能触发click事件，格式不符合不会触发。  
 			plus.push.addEventListener("click", function(msg) {
-				console.log("(click):" + JSON.stringify(msg));
+				//console.log("(click):" + JSON.stringify(msg));
 				if (plus.os.name == "iOS") { //如果是IOS  
 					var payload;
 					if (msg.type == "click") { //APP离线点击包含click属性，这时payload是JSON对象  
@@ -128,7 +125,7 @@
 					} else { //APP在线，收到消息不会包含type属性,这时的payload是JSON字符串，需要转为JSON对象  
 						payload = JSON.parse(msg.payload);
 					}
-					console.log(JSON.stringify(payload))
+					//console.log(JSON.stringify(payload))
 					if (payload.type === 'page') {
 						uni.navigateTo({
 							url: payload.param
@@ -137,7 +134,7 @@
 				}
 				if (plus.os.name == "Android") { //如果是Android，收到playload均是是JSON字符串，需要转为JSON对象  
 					var payload = JSON.parse(msg.payload);
-					console.log(JSON.stringify(payload))
+					//console.log(JSON.stringify(payload))
 					if (payload != null || payload != undefined) {
 						// if(payload.type==='page'){
 						// 	uni.navigateTo({
@@ -150,16 +147,16 @@
 			let cid = ''
 			cid = plus.push.getClientInfo().clientid
 			if (cid.length > 4) {
-				console.log(cid.length + 'cid.length > 4:' + cid)
+				//console.log(cid.length + 'cid.length > 4:' + cid)
 				self.setClientId(cid)
 			} else {
-				console.log(cid.length + 'else:' + cid)
+				//console.log(cid.length + 'else:' + cid)
 				var time = 0;
 				var timer = setInterval(function() {
 					time += 500;
 					cid = plus.push.getClientInfo().clientid
 					if (cid.length > 4 || time >= 10000) {
-						console.log('CID:' + cid)
+						//console.log('CID:' + cid)
 						clearInterval(timer);
 						self.setClientId(cid)
 					}
@@ -168,10 +165,10 @@
 			// #endif
 		},
 		onShow: function() {
-			console.log('App Show')
+			//console.log('App Show')
 		},
 		onHide: function() {
-			console.log('App Hide')
+			//console.log('App Hide')
 		},
 		watch: {
 			userInfo: {
@@ -248,7 +245,7 @@
 				uni.getSystemInfo({
 					success(system) {
 						if (system.errMsg === 'getSystemInfo:ok') {
-							console.log(system)
+							//console.log(system)
 							that.setSystemInfo(system)
 
 							// #ifdef MP-WEIXIN

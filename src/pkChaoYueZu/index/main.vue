@@ -112,11 +112,9 @@
 			this.$refs.QSTabsWxs.setTabs(this.tabs);
 		},
 		onLoad() {
-			console.log('首页进入')
 			let self = this;
 			// #ifdef APP-PLUS
 			plus.runtime.getProperty(plus.runtime.appid, function(widgetInfo) {
-				// console.log(JSON.stringify(widgetInfo))
 				setTimeout(() => {
 					self.checkUpdate(widgetInfo)
 				}, 500)
@@ -129,10 +127,8 @@
 			},
 			checkUpdate(widgetInfo) {
 				return false
-				console.log('aa')
 				let self = this
 				let version = widgetInfo.version
-				console.log('widgetInfo---' + version.length)
 				let getData = {
 					platform: plus.os.name, //plus.os.name
 					version: version
@@ -167,7 +163,6 @@
 				let view = uni.createSelectorQuery().in(this);
 				view.select('.topView').boundingClientRect();
 				view.exec(res => {
-					// console.log('总高度:' + JSON.stringify(res));
 					this.topViewHeight = res[0].height;
 				})
 			},

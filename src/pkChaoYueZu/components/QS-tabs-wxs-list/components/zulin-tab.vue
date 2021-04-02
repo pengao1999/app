@@ -302,7 +302,7 @@
 			},
 			clickBanner: function(curBanner) {
 
-				console.log(curBanner.param)
+				//console.log(curBanner.param)
 				if (curBanner.param !== '') {
 					uni.navigateTo({
 						url: '/pkChaoYueZu/index/detail?key=' + curBanner.param
@@ -316,7 +316,7 @@
 					if (res.code === 0) {
 						let now = (new Date()).getTime()
 						let time = res.msg ? parseInt(res.msg) * 1000 : 0
-						console.log("time:" + time + ",now:" + now)
+						//console.log("time:" + time + ",now:" + now)
 						if (time > now) {
 							self.time = time - now
 							self.$refs.countdown.restart()
@@ -330,7 +330,7 @@
 					// self.toast(true)
 					res = res.data
 					if (res.code === 0) {
-						console.log(res)
+						//console.log(res)
 						self.imgRoot = res.other.img_root
 						res.data.banner.forEach((item, index) => {
 							let name = item.pic
@@ -340,7 +340,7 @@
 							item.originalPic = imageUrl
 						})
 						self.swiperList = res.data.banner
-						console.log(self.swiperList)
+						//console.log(self.swiperList)
 
 						self.indexAd = Object.assign(res.data.indexAd, {
 							picName: res.data.indexAd.pic,
@@ -379,7 +379,7 @@
 			getClassify: function() {
 				let self = this
 				self.$Phttp.post(Config.JAVA_SAAS_URLS.getClassify, {}).then((res) => {
-					console.log(res)
+					//console.log(res)
 					res = res.data
 					if (res.code === 0) {
 						self.menuData = []
@@ -391,7 +391,7 @@
 								self.menuData.push(item)
 							}
 						})
-						console.log(self.menuData)
+						//console.log(self.menuData)
 						res.data.regions.forEach((item, index) => {
 							item.cate_img = item.cate_img
 							if (self.regions.length < 3) {
@@ -409,7 +409,7 @@
 				self.$Phttp.post(Config.JAVA_SAAS_URLS.getGoodsOrderByClassify, data).then(res => {
 					self.toast(true)
 					res = res.data
-					console.log(res)
+					//console.log(res)
 					if (res.code === 0) {
 						res.data.forEach((item, index) => {
 							item.unit = self.parseUnit(item.periodType) || item.unit
@@ -418,7 +418,7 @@
 						self.productList = res.data
 					}
 				})
-				console.log(self.productList)
+				//console.log(self.productList)
 			},
 			parseUnit(peroidType) {
 				let unit = ''
@@ -445,13 +445,13 @@
 				})
 			},
 			tooneminute: function() {
-				console.log('进来了')
+				//console.log('进来了')
 				uni.navigateTo({
 					url: '/pkChaoYueZu/index/cyzoneminute'
 				})
 			},
 			clickNavList: function(index) {
-				console.log(index)
+				//console.log(index)
 				this.setCatId(index)
 				uni.switchTab({
 					url: '/pkChaoYueZu/category/category'
@@ -461,7 +461,7 @@
 				// })
 			},
 			toClassify(classify) {
-				console.log(classify)
+				//console.log(classify)
 				uni.setStorageSync("children_classify", classify)
 				uni.navigateTo({
 					url: '/pkChaoYueZu/index/children/classify?key=' + classify.category_key
