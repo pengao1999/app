@@ -1,0 +1,62 @@
+<template>
+	<view class="" >
+		<view style="background: #FFFFFF;" :style="{height: statusBarHeight + 'px'}"></view>
+		<QSTabsListNvue 
+		ref="QSTabsListNvue" 
+		:height="windowHeight-statusBarHeight" 
+		:minWidth="minWidth"
+		defCurrent="0"></QSTabsListNvue>
+	</view>
+</template>
+
+<script>
+	import QSTabsListNvue from '../components/QS-tabs-list-nvue/QS-tabs-list-nvue.nvue';
+	export default {
+		components: {
+			QSTabsListNvue
+		},
+		data() {
+			return {
+				title: 'Hello',
+				minWidth: '150rpx',
+				windowHeight: 0,
+				statusBarHeight: 48,
+				tabs: [
+					{
+						name: '租赁',
+						id: "tab_0",
+						hasRefreshContainerBackgroundColor: "#40d2ef",
+						type: 'zulin'
+					},
+					{
+						name: '悦品',
+						id: "tab_1",
+						hasRefreshContainerBackgroundColor: "#40d2ef",
+						type: 'yueji'
+					},
+					{
+						name: '维修',
+						id: "tab_2",
+						hasRefreshContainerBackgroundColor: "#40d2ef",
+						type: 'weixiu'
+					},
+				]
+			}
+		},
+		mounted() {
+			const {
+				windowHeight,
+				screenHeight,
+				statusBarHeight
+			} = uni.getSystemInfoSync();
+			this.windowHeight = windowHeight
+			this.statusBarHeight = statusBarHeight
+			let n = 0;
+			this.$refs.QSTabsListNvue.setTabs(this.tabs);
+		}
+	}
+</script>
+
+<style>
+
+</style>

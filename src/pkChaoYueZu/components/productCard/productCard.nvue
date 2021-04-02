@@ -1,0 +1,106 @@
+<template>
+    <view class="productCard coloum-container shadow-warp" style="border-radius: 10upx;background-color: #FFFFFF;" :style="{marginTop: marginTop, width: width}" @click="clickItem()">
+        <image class="productImg bg-gray" mode="widthFix" :src="img">
+        <view class="productInfoContainer" :style="{width: width}">
+			<view class="row-container align-center" style="height: 40upx;line-height: 40upx;">
+				<view class="justify-center align-center" style="background-color: #FEEEEE;padding: 10upx 6upx;">
+					<text style="color: #FF6060;font-size: 24upx;" v-if="tag.length>0">{{tag[0]}}</text>
+				</view>
+				<text class="one-line-dot" style="color: #999999;font-size: 30upx;margin-left: 10upx;" :style="{width: tag.length>0?(titleWidth-40):titleWidth+'upx'}">{{title}}</text>
+			</view>
+			<text style="color: #222222;font-size: 32upx;margin-top: 10upx;">¥{{price.toFixed(2)}}/月起</text>
+			<view class="row-container" style="margin-top: 10upx;">
+				<image src="/static/chaoyuezu/index/vip.png" mode="widthFix" style="width: 80upx;height: 26upx;"></image>
+				<image style="width: 80upx;margin-left: 20upx;height: 26upx;" mode="widthFix" src="/static/chaoyuezu/index/shareGoods.png"></image>
+			</view>
+        </view>
+    </view>
+</template>
+
+<script>
+    export default {
+        name: "productCard",
+        props: {
+            img: {
+                type: String,
+                default: ''
+            },
+			picName: {
+				type: String,
+				default: ''
+			},
+			originalPic: {
+				type: String,
+				default: ''
+			},
+            title: {
+                type: String,
+                default: ''
+            },
+            productKey: {
+                type: String,
+                default: ''
+            },
+			price: {
+				type: Number,
+				default: 0
+			},
+			tag: {
+				type: Array,
+				default() {
+					return []
+				}
+			},
+			marginTop: {
+				type: String,
+				default: '0px'
+			},
+			width: {
+				type: String,
+				default: '280upx'
+			},
+			titleWidth: {
+				type: Number,
+				default: 200
+			}
+        },
+        methods: {
+            clickItem() {
+                this.$emit("clickItem", this.productKey)
+            },
+			imageError(e) {
+				this.pic = this.originalPic
+				ImageCache.remove(this.picName)
+			},
+        }
+    }
+</script>
+
+<style scoped>
+    .productCard {
+        width: 334upx;
+        height: 498upx;
+        border-radius:8upx;
+        justify-content: center;
+		align-items: center;
+    }
+	.productImg {
+	    width: 280upx;
+	    height: 304upx;
+	    border-top-left-radius: 8upx;
+	    border-top-right-radius: 8upx;
+	}
+	.productInfoContainer {
+	    padding: 20upx 10upx 20upx 20upx;
+		align-items: flex-start;
+	}
+	/**单行...*/
+	.one-line-dot {
+	  overflow: hidden;
+	  text-overflow: ellipsis;
+	  white-space: nowrap;
+	  word-break: keep-all;
+	  max-lines: 1;
+	  lines:1;
+	}
+</style>

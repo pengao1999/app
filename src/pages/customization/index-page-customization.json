@@ -1,0 +1,50 @@
+{
+    "nav": {
+        "format": {
+            "background": "#1dc422"
+        },
+        "element": {
+            "title": "友邻商城"
+        }
+    },
+    "address": {
+        "format": {
+            "background": "#1dc422",
+            "color": "#FFFFFF"
+        },
+        "element": {
+            "showRecord": true
+        }
+    },
+    "notice": {
+        "format": {
+            "background": "#ffcc00",
+            "color": "#FFFFFF",
+            "marginTop": "0rpx",
+            "marginBottom": "0rpx"
+        },
+        "element": {}
+    },
+    "swiper": {
+        "format": {
+            "height": "300rpx",
+            "marginTop": "10rpx",
+            "marginBottom": "10rpx"
+        },
+        "element": {}
+    },
+    "menu": {
+        "format": {
+            "background": "#FFFFFF",
+            "color": "#333",
+            "marginTop": "0rpx",
+            "marginBottom": "0rpx",
+            "marginLeftRight": "0rpx"
+        },
+        "element": {}
+    },
+    "goodList": {
+        "format": {},
+        "element": {}
+    }
+}

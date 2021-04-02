@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="36px" height="36px" viewBox="0 0 36 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>a020_icon_address</title>
+    <desc>Created with Sketch.</desc>
+    <g id="IOS" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="a020购物订单" transform="translate(-16.000000, -86.000000)">
+            <g id="收货地址" transform="translate(0.000000, 64.000000)">
+                <g id="a020_icon_address" transform="translate(16.000000, 22.000000)">
+                    <g>
+                        <g>
+                            <rect id="矩形" fill="#484A5A" opacity="0" x="0" y="0" width="36" height="36"></rect>
+                            <g id="编组-12" transform="translate(7.000000, 3.000000)">
+                                <rect id="Rectangle-5" fill="#E9342A" x="5" y="28" width="12" height="1.5"></rect>
+                                <path d="M11.0000053,24.0721352 C17.8605867,19.0350895 21.25,14.6407249 21.25,10.9839817 C21.25,5.33215454 16.6611632,0.75 11,0.75 C5.33883685,0.75 0.75,5.33215454 0.75,10.9839817 C0.75,14.6407258 4.13941504,19.0350918 11,24.0721391 Z" id="椭圆形" stroke="#E9342A" stroke-width="1.5"></path>
+                                <circle id="椭圆形" fill="#F7D43B" cx="11" cy="11" r="4"></circle>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

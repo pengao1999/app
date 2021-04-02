@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>a020_icon_chose</title>
+    <desc>Created with Sketch.</desc>
+    <g id="IOS" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="a020购物订单" transform="translate(-335.000000, -746.000000)" fill="#FFFFFF" stroke="#C1C1C2">
+            <g id="支付方式" transform="translate(0.000000, 421.000000)">
+                <g id="01" transform="translate(16.000000, 275.000000)">
+                    <g transform="translate(0.000000, 40.000000)" id="a020_icon_chose">
+                        <g transform="translate(319.000000, 10.000000)">
+                            <g id="椭圆形">
+                                <g>
+                                    <circle stroke-width="1.5" cx="10" cy="10" r="9.25"></circle>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

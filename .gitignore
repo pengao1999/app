@@ -1,0 +1,8 @@
+unpackage
+.idea
+.DS_Store
+node_modules
+dist
+.vscode
+yarn.lock
+nativeplugins/AThree-Face

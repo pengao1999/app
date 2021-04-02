@@ -1,0 +1,68 @@
+<template>
+	<view class="">
+		<block v-if="type=='zulin'">
+			<ZulinTab ref="zulin" :current="current" @refreshEnd="refreshEnd"></ZulinTab>
+		</block>
+		<block v-if="type=='yueji'">
+			<YuejiTab ref="yueji" :current="current" @refreshEnd="refreshEnd"></YuejiTab>
+		</block>
+		<block v-if="type=='weixiu'">
+			<WeixiuTab ref="weixiu" :current="current" @refreshEnd="refreshEnd"></WeixiuTab>
+		</block>
+	</view>
+</template>
+
+<script>
+	import ZulinTab from './components/zulin-tab.nvue'
+	import YuejiTab from './components/yueji-tab.nvue'
+	import WeixiuTab from './components/weixiu-tab.nvue'
+	import { _isFn, _isUndefOrNull } from '../js/util.js';
+	export default {
+		components: { ZulinTab, YuejiTab, WeixiuTab },
+		props: {
+			current: {
+				type: Number,
+				default: -1
+			},
+			type: {
+				type: String,
+				default: ''
+			},
+			getDataFnName: {
+				type: String,
+				default: 'getData'
+			},
+			tab: {
+				type: Object,
+				default() {
+					return {};
+				}
+			},
+			statusTextColor: {
+				type: String,
+				default: '#666'
+			}
+		},
+		data() {
+			return {
+				componentRefName: 'componentRef'
+			}
+		},
+		methods: {
+			getData(status) {
+				console.log(status)
+				const ref = this.$refs[this.type];
+				if(_isUndefOrNull(ref)) { console.log('找不到当前项的ref'); return; }
+				if(_isFn(ref[this.getDataFnName])) ref[this.getDataFnName](status);
+			},
+			refreshEnd(index, status) {
+				console.log("refreshEnd"+index)
+				this.$emit('refreshEnd', index, status);
+			}
+		}
+	}
+</script>
+
+<style scoped>
+
+</style>

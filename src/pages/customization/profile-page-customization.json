@@ -1,0 +1,115 @@
+{
+	"userInfo": {
+		"format": {
+			"background": "#1dc422",
+			"color": "#FFF"
+		},
+		"element": {}
+	},
+	"userOrder": {
+		"format": {
+			"background": "#FFF",
+			"color": "#333",
+			"borderRadius": "20rpx",
+			"marginLeft": "30rpx",
+			"marginRight": "30rpx",
+			"marginTop": "0rpx",
+			"marginBottom": "0rpx"
+		},
+		"element": [
+			{
+				"type": "order",
+				"name": "待付款",
+				"icon": "/static/ic_pay.png",
+				"param": 1
+			},
+			{
+				"type": "order",
+				"name": "待配送",
+				"icon": "/static/ic_send.png",
+				"param": 2
+			},
+			{
+				"type": "order",
+				"name": "配送中",
+				"icon": "/static/ic_sended.png",
+				"param": 3
+			},
+			{
+				"type": "order",
+				"name": "待自提",
+				"icon": "/static/ic_take.png",
+				"param": 4
+			},
+			{
+				"type": "order",
+				"name": "已完成",
+				"icon": "/static/ic_finish.png",
+				"param": 5
+			}
+		]
+	},
+	"navBox": {
+		"format": {
+			"background": "#FFF",
+			"color": "#333",
+			"marginLeft": "30rpx",
+			"marginRight": "30rpx",
+			"marginTop": "20rpx",
+			"marginBottom": "0rpx",
+			"borderRadius": "20rpx"
+		},
+		"element": [
+			{
+				"image": "/static/service.png",
+				"title": "联系客服"
+			},
+			{
+				"tap": "friend",
+				"image": "/static/friends.png",
+				"title": "邀请好友"
+			},
+			{
+				"tap": "service",
+				"image": "/static/public_account.png",
+				"title": "服务号"
+			}
+		]
+	},
+	"columns": {
+		"format": {
+			"background": "#FFF",
+			"color": "#333",
+			"marginLeft": "30rpx",
+			"marginRight": "30rpx",
+			"marginTop": "40rpx",
+			"marginBottom": "0rpx"
+		},
+		"element": [
+			{
+				"type": "leader",
+				"name": "绑定业务员",
+				"icon": "/static/ic_supplier_apply.png",
+				"param": "leader"
+			},
+			{
+				"type": "protocol",
+				"name": "用户协议与政策",
+				"icon": "/static/ic_protocol.png",
+				"param": "protocol"
+			},
+			{
+				"type": "logout",
+				"name": "退出登录",
+				"icon": "",
+				"param": "logout"
+			}
+		]
+	},
+	"deliveryCode": {
+		"format": {
+			"background": "white"
+		},
+		"element": {}
+	}
+}

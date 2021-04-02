@@ -1,0 +1,4 @@
+Android°üÃû£º com.youxuanbest.cyz
+keyAlias        android.youxuan
+keyPassword 	youxuan
+storePassword 	youxuan

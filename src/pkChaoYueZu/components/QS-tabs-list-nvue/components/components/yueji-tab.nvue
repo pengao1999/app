@@ -1,0 +1,261 @@
+<template>
+	<div>
+		<swiper class="bg-white" style="width: 690upx;height:312upx;border-radius: 12upx;margin-left: 30upx;margin-top: 30upx;" autoplay indicator-dots="true">
+			<swiper-item v-for="(item, key) in swiperList" :key="key">
+				<image style="width: 690upx;height:312upx;border-radius: 12upx;background-color: #ccc;" :src="item.pic" @click="clickIndexAd(item)" mode="aspectFill" @error="imageError(item)" />
+			</swiper-item>
+		</swiper>
+		
+		<waterfall column-count="2" style="width: 690upx;margin-left: 30upx;"
+					:style="{height: (538*goodColumn+80)+'upx'}"
+					 column-width="10"
+					 show-scrollbar='false'>
+			<cell v-for="(product,index) in productList[0].goods" :key="index">
+				<product-card
+				 :img="product.pic" 
+				 :tags="product.tags" 
+				 marginTop="20px" 
+				 width="330upx" 
+				 :titleWidth="320" 
+				 :originalPic="product.originalPic" 
+				 :picName="product.picName" 
+				 :title="product.name" 
+				 :price="product.price" 
+				 :productKey="product.goods_key" 
+				 @clickItem="toProduct"></product-card>
+			</cell>
+		</waterfall>
+		
+	</div>
+</template>
+
+<script>
+	import Config from '@/common/js/Config.js'
+	import Toast from '@/common/js/toast.js'
+	import Util from '@/common/js/util.js'
+	import ImageCache from '@/common/js/ImageCache.js'
+	import SpringRequest from '../../js/Request.js'
+	import ProductCard from '../../../productCard/productCard.nvue'
+	export default {
+		components: {ProductCard},
+		props: {
+			current: {
+				type: Number,
+				default: -1
+			}
+		},
+		data() {
+			return {
+				swiperList: [
+					{
+						pic: ''
+					},
+					{
+						pic: ''
+					}
+				],
+				productList: [
+					{
+						name: '',
+						goods: [
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							},
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							},
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							},
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							},
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							},
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							}
+						]
+					}
+				],
+				goodColumn: 0
+			}
+		},
+		mounted() {
+			this.init()
+		},
+		methods: {
+			getData(status) {
+				console.log(status)
+				let refresh = false;
+				let doEvent = false;
+				switch (status) {
+					case 'init':
+						refresh = true;
+						break;
+					case 'refresh':
+						refresh = true;
+						break;
+					default:
+						doEvent = true;
+						break;
+				}
+				let _this = this;
+				setTimeout(() => {
+					_this.$emit('refreshEnd', _this.current, true);
+				}, 2000)
+				if (refresh) {
+					_this.init()
+				}
+				
+			},
+			init() {
+				let self = this
+				self.getAd()
+				self.getGoodsOrderByClassify()
+				
+			},
+			getAd() {
+				let self = this
+			
+				SpringRequest.post('/ad/getAds', {}, undefined, res => {
+				  res = res.data
+				  if (res.code === 0) {
+				  	self.imgRoot = res.other.img_root
+					
+				  	res.data.banner.forEach((item, index) => {
+				  		let name = item.picName?item.picName: item.pic
+				  		let imageUrl = self.imgRoot + item.pic
+				  		item.pic = ImageCache.get(name, imageUrl)
+				  		item.picName = name
+				  		item.originalPic = imageUrl
+				  	})
+				  	self.swiperList = res.data.banner
+				  }
+				}, err => {
+					console.log(JSON.stringify(err))
+				}, true)
+			},
+			getGoodsOrderByClassify: function () {
+				let self = this
+				SpringRequest.post('/good/rent/getGoodsOrderByClassify', {}, undefined, res => {
+					res = res.data
+					if (res.code === 0) {
+						res.data.forEach((item, index) => {
+							item.unit = self.parseUnit(item.periodType) || item.unit
+						})
+						self.imgRoot = res.other.img_root
+						res.data.forEach((classify, cIndex) => {
+							let name = classify.picName?classify.picName:classify.cate_img
+							let imageUrl = self.imgRoot + classify.cate_img
+							classify.cate_img = ImageCache.get(name, imageUrl)
+							classify.picName = name
+							classify.originalPic = imageUrl
+							classify.goods.forEach((good, gIndex) => {
+								let innerName = good.picName?good.picName:good.pic
+								let innerImageUrl = self.imgRoot + good.pic
+								good.pic = ImageCache.get(innerName, innerImageUrl)
+								good.picName = innerName
+								good.originalPic = innerImageUrl
+								if (good.tags === "") {
+									good.tags = []
+								} else {
+									if (good.tags instanceof String) {
+										good.tags = good.tags.split(",")
+									}
+									
+								}
+							})
+						})
+						self.productList = res.data
+						self.goodColumn = Math.ceil(self.productList[0].goods.length / 2)
+					}
+				}, err => {
+					
+				}, true)
+			},
+			parseUnit(peroidType) {
+			    let unit = peroidType
+			    switch(peroidType) {
+			        case 1:
+			            unit='日'
+			            break;
+			        case 2:
+			            unit='周'
+			        case 3:
+			            unit='月'
+			            break;
+			        case 4:
+			            unit='年'
+			            break;
+			    }
+			    return unit;
+			},
+			toProduct: function (key) {
+				// window.location.href = 'http://www.baidu.com'
+				// window.open('http://h5app.test.youxuanbest.com/#/pkPointMall/index/detail?id='+id+'&token=' + this.point_token, '商品详情')
+				uni.navigateTo({
+					url: '/pkChaoYueZu/index/detail?key=' + key
+				})
+			},
+			clickIndexAd(item) {
+				switch(item.type) {
+					case 'business-apply':
+						uni.navigateTo({
+							url: '/pkUserInfo/info/protocolDetails?id=1a4db6ef00ae4b189ffc40805d8b9a9f&title=产品介绍'
+						})
+						break
+					case 'product':
+						uni.navigateTo({
+							url: '/pkChaoYueZu/index/detail?key='+item.param
+						})
+						break;
+					case 'url':
+						uni.setStorageSync("indexUrl", item.param)
+						uni.navigateTo({
+							url: '/pkChaoYueZu/index/children/web'
+						})
+						break;
+				}
+			},
+			imageError(e) {
+				e.pic = e.originalPic
+				ImageCache.remove(e.picName)
+			},
+			imageCateError(e) {
+				e.cate_img = e.originalPic
+				ImageCache.remove(e.picName)
+			}
+		}
+	}
+</script>
+
+<style scoped>
+.justify-center {
+	justify-content: center;
+}
+.block-container {
+	display: inline-block;
+	flex-wrap: wrap;
+	overflow: hidden;
+}
+</style>

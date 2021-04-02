@@ -1,0 +1,14 @@
+{
+    "search": {
+        "format": {
+            "background": "#1dc422"
+        },
+        "element": {}
+    },
+    "categoryList": {
+        "format": {
+            "color": "#1dc422"
+        },
+        "element": {}
+    }
+}

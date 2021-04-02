@@ -1,0 +1,60 @@
+<!--ErrorTip-page-->
+<template>
+	<div>
+		<div class="tip slide-down"><text class="tip-text">ad</text></div>
+	</div>
+</template>
+<script>
+  export default {
+    config: {},
+    props: {
+      propData: Object
+    },
+    components: {},
+    data() {
+      return {
+		  myData: {},
+		  timeOut: null
+	  }
+    },
+    watch: {
+      propData: {
+        handler(newv, oldv) {
+//           let that = this
+// 					if (this.propData === undefined) return
+//           this.myData = Object.assign({}, this.propData)
+//           if (that.timeOut !== null) {
+//             clearTimeout(that.timeOut)
+//           }
+//           let time = that.myData.time || 3000
+//           that.timeOut = setTimeout(function () {
+//             clearTimeout(that.timeOut)
+//             that.myData.show = false
+//             !that.myData.show && that.$emit('hide', Object.assign({}, that.myData))
+//           }, time)
+        },
+        immediate: true
+      }
+    },
+    methods: {}
+  }
+</script>
+<style>
+  @import "../../common/css/animation";
+  .tip {
+    position: fixed;
+    z-index: 999;
+    width: 750px;
+    height: 88px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #F24D4D;
+   margin-top: 160px;
+  }
+	.tip-text {
+		font-size: 28px;
+		color: white;
+	}
+</style>

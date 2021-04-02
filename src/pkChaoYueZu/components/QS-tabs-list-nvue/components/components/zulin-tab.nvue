@@ -1,0 +1,416 @@
+<template>
+	<view class="page-container">
+		<swiper class="bg-white" style="width: 690upx;height:312upx;border-radius: 12upx;margin-left: 30upx;margin-top: 30upx;" autoplay indicator-dots="true">
+			<swiper-item v-for="(item, key) in swiperList" :key="key">
+				<image style="width: 690upx;height:312upx;border-radius: 12upx;background-color: #ccc;" :src="item.pic" @click="clickIndexAd(item)" mode="aspectFill" @error="imageError(item)" />
+			</swiper-item>
+		</swiper>
+		<view class="row-container mrg-top-20 align-center" style="width: 690upx;height:50upx;margin-left: 30upx;">
+			<image src="/static/chaoyuezu/index/zulin-index-tip.png" style="width:44upx;height:44upx;" />
+			<text style="font-size:28upx;font-family:PingFangSC-Medium,PingFang SC;font-weight:500;color:#222222;margin-left: 14upx;">信用免押 轻松换新</text>
+		</view>
+		
+		<view style="width: 750upx;">
+			<my-menu :propData="menuData" @clickNavList="clickNavList"></my-menu>
+		</view>
+		
+		<image v-if="regions.length > 0" :src="regions[0].cate_img" @click="toClassify(regions[0])" style="width: 690upx;height: 172upx;border-radius:8upx;margin-left: 30upx;background: #ccc;"/>
+		
+		<view style="height: 20upx;"></view>
+		<view style="margin-bottom: 20upx;width: 750upx;" v-for="(classify, cIndex) in productList" v-if="classify.goods.length>0" :key="cIndex">
+			<image :src="classify.cate_img" style="position: absolute;margin-left: 0upx;margin-top: 0upx;width: 750upx;height: 500upx;z-index: -1;" @error="imageCateError"></image>
+			<view class="cu-barsolid-bottom" style="zoom: 1;">
+				<view class="action">
+					<!--            <text class="icon-titles text-green" style="color: #f37b1d;"></text>-->
+					<view
+							class="text-white row-container align-center"
+							v-if="classify.name!=''"
+							style="padding-top: 30upx;padding-left: 40upx;width:720upx;font-family:MFJianHei_Noncommercial-Regular,MFJianHei_Noncommercial;font-weight:400;"
+					>
+						<text style="font-size: 40upx;color: #FFFFFF;width: 570upx;font-weight: bold;">{{classify.name}}</text>
+						<text style="margin-left: auto;color: #FFFFFF;font-size: 36upx;" @click="toClassify(classify)">更多</text>
+						<image style="width: 40upx;height: 40upx;" mode="widthFix" src="/static/chaoyuezu/icon_right_white.png"></image>
+					</view>
+					<text class="bg-gray" style="width: 120upx;height: 30upx;" v-else></text>
+				</view>
+			</view>
+		
+			<scroll-view
+				scroll-x="true"
+				class="tabs-scroll mrg-top-20 row-container"
+				style="width: 750upx;"
+				scroll-with-animation
+			>
+				<view class="justify-center" v-for="(product,index) in classify.goods" :key="index" v-if="index < 8" style="width:310upx;display: flex;margin-bottom: 20upx;">
+					<view style="margin-left: 40upx;">
+						<product-card :img="product.originalPic" :tags="product.tags" :originalPic="product.originalPic" :picName="product.picName" :title="product.name" :price="product.price" :productKey="product.goods_key" @clickItem="toProduct"></product-card>
+					</view>
+				</view>
+			</scroll-view>
+			<view style="height: 2px;background: #F8F8F8;"></view>
+		</view>
+		
+		<view style="margin-bottom: 20upx;">
+			<view class="cu-barsolid-bottom" style="zoom: 1;">
+				<view class="action">
+					<view
+							class="text-black row-container align-center"
+							style="padding-top: 30upx;padding-left: 40upx;width:720upx;font-family:MFJianHei_Noncommercial-Regular,MFJianHei_Noncommercial;font-weight:400;"
+					>
+						<view style="font-size: 36upx;">合作伙伴</view>
+					</view>
+					<text class="bg-gray" style="width: 120upx;height: 30upx;"></text>
+				</view>
+			</view>
+		</view>
+		<view style="width: 750upx;">
+			<my-menu :propData="parners"></my-menu>
+		</view>
+	</view>
+</template>
+
+<script>
+	import Config from '@/common/js/Config.js'
+	import Toast from '@/common/js/toast.js'
+	import Util from '@/common/js/util.js'
+	import ImageCache from '@/common/js/ImageCache.js'
+	import SpringRequest from '../../js/Request.js'
+	import myMenu from './myMenu.nvue'
+	import {
+		doPageDemand
+	} from '../../js/pageDemand.js';
+	import ProductCard from '../../../productCard/productCard.nvue'
+	import {
+	  mapMutations
+	} from 'vuex'
+	export default {
+		components: {myMenu, ProductCard},
+		props: {
+			current: {
+				type: Number,
+				default: -1
+			}
+		},
+		data() {
+			return {
+				swiperList: [
+					{
+						pic: ''
+					},
+					{
+						pic: ''
+					}
+				],
+				imgRoot: '',
+				indexAd: {},
+				menuData: [
+					{
+						id: 1,
+						cate_img: '',
+						name: 'hhh'
+					},
+					{
+						id: 2,
+						cate_img: '',
+						name: 'hhh'
+					},
+					{
+						id: 3,
+						cate_img: '',
+						name: 'hhh'
+					},
+					{
+						id: 4,
+						cate_img: '',
+						name: 'hhh'
+					},
+					{
+						id: 5,
+						cate_img: '',
+						name: 'hhh'
+					},
+					{
+						id: 6,
+						cate_img: '',
+						name: 'hhh'
+					},	
+				],
+				regions: [],
+				parners: [
+					{
+						id: 1,
+						cate_img: '/static/chaoyuezu/index/zhima.png',
+						name: '芝麻信用'
+					},
+					{
+						id: 2,
+						cate_img: '/static/chaoyuezu/index/liantong.png',
+						name: '中国联通'
+					},
+					{
+						id: 3,
+						cate_img: '/static/chaoyuezu/index/pingguo.png',
+						name: '苹果'
+					},
+					{
+						id: 4,
+						cate_img: '/static/chaoyuezu/index/huawei.png',
+						name: '华为'
+					},
+				],
+				productList: [
+					{
+						name: '',
+						goods: [
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							},
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							},
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							},
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							},
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							},
+							{
+								name: '',
+								pic: '',
+								price: 0,
+								original_price: 0
+							}
+						]
+					}
+				],
+			}
+		},
+		mounted() {
+			this.init()
+		},
+		methods: {
+			...mapMutations(['setCatId']),
+			getData(status) {
+				console.log(status)
+				let refresh = false;
+				let doEvent = false;
+				switch (status) {
+					case 'init':
+						refresh = true;
+						break;
+					case 'refresh':
+						refresh = true;
+						break;
+					default:
+						doEvent = true;
+						break;
+				}
+				let _this = this;
+				setTimeout(() => {
+					_this.$emit('refreshEnd', _this.current, true);
+				}, 2000)
+				if (refresh) {
+					_this.init()
+				}
+			},
+			init(refresh) {	//若是用户触发下拉刷新则refresh为true
+				let self = this
+				self.getAd()
+				self.getClassify()
+				self.getGoodsOrderByClassify()
+			},
+			getAd() {
+				let self = this
+			
+				SpringRequest.post('/ad/getAds', {}, undefined, res => {
+				  res = res.data
+				  if (res.code === 0) {
+				  	self.imgRoot = res.other.img_root
+					
+				  	res.data.banner.forEach((item, index) => {
+				  		let name = item.picName?item.picName: item.pic
+				  		let imageUrl = self.imgRoot + item.pic
+				  		item.pic = ImageCache.get(name, imageUrl)
+				  		item.picName = name
+				  		item.originalPic = imageUrl
+				  	})
+				  	self.swiperList = res.data.banner
+				  }
+				}, err => {
+					console.log(JSON.stringify(err))
+				}, true)
+			},
+			getClassify: function () {
+				let self = this
+				SpringRequest.post('/categorys/getClassify', {}, undefined, (res) => {
+					res = res.data
+					if (res.code === 0) {
+						self.menuData = []
+						self.regions = []
+						let img_root = res.other.img_root
+						res.data.main.forEach((item, index) => {
+							let name = item.picName?item.picName:item.cate_img
+							let imageUrl = img_root + item.cate_img
+							item.cate_img = ImageCache.get(name, imageUrl)
+							item.picName = name
+							item.originalPic = imageUrl
+							if (self.menuData.length < 8) {
+								self.menuData.push(item)
+							}
+						})
+						res.data.regions.forEach((item, index) => {
+							let name = item.picName?item.picName:item.cate_img
+							let imageUrl = img_root + item.cate_img
+							item.cate_img = ImageCache.get(name, imageUrl)
+							item.picName = name
+							item.originalPic = imageUrl
+							if (self.regions.length < 3) {
+								self.regions.push(item)
+							}
+						})
+					}
+				}, err => {
+					
+				}, true)
+			},
+			getGoodsOrderByClassify: function () {
+				let self = this
+				SpringRequest.post('/good/rent/getGoodsOrderByClassify', {}, undefined, res => {
+					res = res.data
+					if (res.code === 0) {
+						res.data.forEach((item, index) => {
+							item.unit = self.parseUnit(item.periodType) || item.unit
+						})
+						self.imgRoot = res.other.img_root
+						res.data.forEach((classify, cIndex) => {
+							let name = classify.picName?classify.picName:classify.cate_img
+							let imageUrl = self.imgRoot + classify.cate_img
+							classify.cate_img = ImageCache.get(name, imageUrl)
+							classify.picName = name
+							classify.originalPic = imageUrl
+							classify.goods.forEach((good, gIndex) => {
+								let innerName = good.picName?good.picName:good.pic
+								let innerImageUrl = self.imgRoot + good.pic
+								good.pic = innerImageUrl
+								good.picName = innerName
+								good.originalPic = innerImageUrl
+								if (good.tags === "") {
+									good.tags = []
+								} else {
+									if (good.tags instanceof String) {
+										good.tags = good.tags.split(",")
+									}
+									
+								}
+							})
+						})
+						self.productList = res.data
+					}
+				}, err => {
+					
+				}, true)
+			},
+			parseUnit(peroidType) {
+			    let unit = peroidType
+			    switch(peroidType) {
+			        case 1:
+			            unit='日'
+			            break;
+			        case 2:
+			            unit='周'
+			        case 3:
+			            unit='月'
+			            break;
+			        case 4:
+			            unit='年'
+			            break;
+			    }
+			    return unit;
+			},
+			toProduct: function (key) {
+				// window.location.href = 'http://www.baidu.com'
+				// window.open('http://h5app.test.youxuanbest.com/#/pkPointMall/index/detail?id='+id+'&token=' + this.point_token, '商品详情')
+				uni.navigateTo({
+					url: '/pkChaoYueZu/index/detail?key=' + key
+				})
+			},
+			toClassify(classify) {
+				uni.setStorageSync("children_classify", classify)
+				uni.navigateTo({
+					url: '/pkChaoYueZu/index/children/classify?key='+classify.category_key
+				})
+			},
+			clickIndexAd(item) {
+				switch(item.type) {
+					case 'business-apply':
+						uni.navigateTo({
+							url: '/pkUserInfo/info/protocolDetails?id=1a4db6ef00ae4b189ffc40805d8b9a9f&title=产品介绍'
+						})
+						break
+					case 'product':
+						uni.navigateTo({
+							url: '/pkChaoYueZu/index/detail?key='+item.param
+						})
+						break;
+					case 'url':
+						uni.setStorageSync("indexUrl", item.param)
+						uni.navigateTo({
+							url: '/pkChaoYueZu/index/children/web'
+						})
+						break;
+				}
+			},
+			clickNavList: function (index) {
+			  this.setCatId(index)
+			  uni.switchTab({
+			    url: '/pkChaoYueZu/category/category?id=' + this.menuData[index].id
+			  })
+			},
+			imageError(e) {
+				e.pic = e.originalPic
+				ImageCache.remove(e.picName)
+			},
+			imageCateError(e) {
+				e.cate_img = e.originalPic
+				ImageCache.remove(e.picName)
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.page-container {
+		
+	}
+	.tabs-scroll {
+		width: 100%;
+		white-space: nowrap;
+		position: relative;
+	}
+	.page-section-title {
+	  margin-top: 50upx;
+	}
+	.tower-swiper .tower-item {
+	  transform: scale(calc(0.5 + var(--index) / 10));
+	  margin-left: calc(var(--left) * 100upx - 150upx);
+	  z-index: var(--index);
+	}
+</style>

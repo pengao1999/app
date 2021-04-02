@@ -1,0 +1,60 @@
+{
+    "swiper": {
+        "format": {
+            "height": "530rpx",
+            "marginTop": "20rpx",
+            "marginBottom": "0rpx",
+            "marginLeft": "20rpx",
+            "marginRight": "20rpx"
+        },
+        "element": {}
+    },
+    "baseInfo": {
+        "format": {
+            "marginTop": "0rpx",
+            "marginBottom": "0rpx",
+            "marginLeft": "24rpx",
+            "marginRight": "24rpx",
+            "background": "#FFFFFF"
+        },
+        "element": {}
+    },
+    "coupon": {
+        "format": {
+            "background": "#FFFFFF",
+            "marginTop": "20rpx",
+            "marginLeft": "24rpx",
+            "marginRight": "24rpx"
+        },
+        "element": {}
+    },
+    "buyer": {
+        "format": {
+            "marginTop": "20rpx",
+            "marginBottom": "20rpx",
+            "marginLeft": "24rpx",
+            "marginRight": "24rpx",
+            "background": "#FFFFFF"
+        },
+        "element": {}
+    },
+    "detail": {
+        "format": {
+            "marginTop": "20rpx",
+            "marginBottom": "0rpx",
+            "marginLeft": "0rpx",
+            "marginRight": "0rpx"
+        },
+        "element": {}
+    },
+    "service": {
+        "format": {
+            "background": "#FFFFFF",
+            "marginTop": "20rpx",
+            "marginBottom": "0rpx",
+            "marginLeft": "24rpx",
+            "marginRight": "24rpx"
+        },
+        "element": {}
+    }
+}

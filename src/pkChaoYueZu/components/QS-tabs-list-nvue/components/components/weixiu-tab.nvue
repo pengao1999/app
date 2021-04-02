@@ -1,0 +1,90 @@
+<template>
+	<view>
+		<image 
+		style="width:690upx;border-radius: 12rpx;margin-top: 20upx;margin-left: 30upx;" 
+		mode="widthFix" 
+		src="/static/chaoyuezu/index/weixiu-banner.png"></image>
+		
+		<waterfall column-count="2"  class="block-container mrg-top-20" style="width: 690upx;margin-left: 30upx;height: 140upx;">
+			<cell class="menu-contaner row-container mrg-top-20 align-center" style="background-color: #FFF;width: 336upx;margin-bottom: 20upx;" @click="toProblem('PH', '手机')">
+				<image style="width:96upx;height: 96upx;margin-left: 40upx;" mode="widthFix" src="/static/chaoyuezu/index/weixiu/weixiu1.png"></image>
+				<view class="coloum-container" style="margin-left: 20upx;">
+					<text style="color: #222;font-size: 26upx;">手机</text>
+					<text style="color: #999;font-size: 22upx;">Mobile</text>
+				</view>
+			</cell>
+			<cell class="menu-contaner bg-white mrg-top-20 row-container align-center" style="margin-left: 18upx;background-color: #FFF;width: 336upx;margin-bottom: 20upx;" @click="toProblem('BJ', '电脑')">
+				<image style="width:96upx;height: 96upx;margin-left: 40upx;" mode="widthFix" src="/static/chaoyuezu/index/weixiu/weixiu2.png"></image>
+				<view class="coloum-container" style="margin-left: 20upx;">
+					<text style="color: #222;font-size: 26upx;">电脑</text>
+					<text style="color: #999;font-size: 22upx;">Computer</text>
+				</view>
+			</cell>
+		</waterfall>
+		
+		<waterfall column-count="2" class="block-container" style="width: 690upx;margin-left: 30upx;height: 140upx;margin-top: 20upx;">
+			<cell class="menu-contaner bg-white mrg-top-20 row-container align-center mrg-top-10" style="background-color: #FFF;width: 336upx;" @click="toProblem('SM', '相机')">
+				<image style="width:96upx;height: 96upx;margin-left: 40upx;" mode="widthFix" src="/static/chaoyuezu/index/weixiu/weixiu3.png"></image>
+				<view class="coloum-container" style="margin-left: 20upx;">
+					<text style="color: #222;font-size: 26upx;">相机</text>
+					<text style="color: #999;font-size: 22upx;">Camera</text>
+				</view>
+			</cell>
+			<cell class="menu-contaner bg-white mrg-top-20 row-container align-center mrg-top-10" style="margin-left: 18upx;background-color: #FFF;width: 336upx;">
+				<image style="width:96upx;height: 96upx;margin-left: 40upx;" mode="widthFix" src="/static/chaoyuezu/index/weixiu/weixiu4.png"></image>
+				<view class="coloum-container" style="margin-left: 20upx;">
+					<text style="color: #222;font-size: 26upx;">平板</text>
+					<text style="color: #999;font-size: 22upx;">Ipad</text>
+				</view>
+			</cell>
+		</waterfall>
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+			current: {
+				type: Number,
+				default: -1
+			}
+		},
+		methods: {
+			getData(status) {
+				console.log(status)
+				let refresh = false;
+				let doEvent = false;
+				switch (status) {
+					case 'init':
+						refresh = true;
+						break;
+					case 'refresh':
+						refresh = true;
+						break;
+					default:
+						doEvent = true;
+						break;
+				}
+				let _this = this;
+				setTimeout(() => {
+					_this.$emit('refreshEnd', _this.current, true);
+				}, 2000)
+			},
+			toProblem(code, name) {
+				uni.navigateTo({
+					url: '/pkChaoYueZu/index/children/problems?code='+code + '&name='+name
+				})
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.menu-contaner {
+		width: 336upx;
+		height: 140upx;
+	}
+	.mrg-top-20 {
+		margin-top: 20upx;
+	}
+</style>

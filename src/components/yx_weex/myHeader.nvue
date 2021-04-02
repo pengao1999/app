@@ -1,0 +1,137 @@
+<template>
+	<div>
+		<div class="MyHeader-page">
+			<div class="head">
+				<div class="title-con">
+					<div class="MyHeader-title">{{myData.title}}</div>
+				</div>
+				<image @tap="closeLogin" v-if="myData.showClose" class="header-close" src="../../static/login_close.png"></image>
+			</div>
+		</div>
+	</div>
+	<!-- <div class="MyHeader-page" :style="'height:'+height+'px;'+myData.style">
+		<div class="head" :style="'margin-top:'+statusBarHeight+'px;'">
+			<div class="title-con" :style="myData.titleConStyle">
+				<div class="MyHeader-title">{{myData.title}}</div>
+			</div>
+			<image @tap="closeLogin" v-if="myData.showClose" class="header-close" src="../../static/login_close.png"></image>
+		</div>
+	</div> -->
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				statusBarHeight: 44,
+				height: 160,
+				myData: {
+					style: 'background-color:#FFFFFF;', // 头部样式
+					showClose: true,// 返回样式
+					title: '验证码登录'
+				}
+			}
+		},
+		props: {
+			propData: Object
+		},
+		watch: {
+			propData: {
+				handler() {
+					this.myData = Object.assign({}, this.myData, this.propData)
+					this.height = this.propData.height
+				},
+				immediate: true
+			}
+		},
+		methods: {
+			closeLogin: function() {
+				this.$emit('closeLogin')
+			}
+		}
+	}
+// 	export default {
+// 		data() {
+// 			return {
+// 				statusBarHeight: 44,
+// 				height: 88,
+// 				myData: {
+// 					style: 'background-color:#FFFFFF;', // 头部样式
+// 					showClose: true,// 返回样式
+// 					title: '验证码登录'
+// 				}
+// 			}
+// 		},
+// 		props: {
+// 			propData: Object
+// 		},
+// 		watch: {
+// 			systemInfo: {
+// 				handler() {
+// 					if (this.systemInfo !== undefined) {
+// 						this.statusBarHeight = this.systemInfo.statusBarHeight
+// 					}
+// 				},
+// 				immediate: true
+// 			},
+// 			propData: {
+// 				handler() {
+// 					this.myData = Object.assign({}, this.myData, this.propData)
+// 					this.height = this.propData.height
+// 				},
+// 				immediate: true
+// 			}
+// 		},
+// 		computed: {
+// 			systemInfo() {
+// 				return this.$store.state.systemInfo
+// 			},
+// 		},
+// 		methods: {
+// 			closeLogin: function() {
+// 				this.$emit('closeLogin')
+// 			}
+// 		}
+// 	}
+</script>
+
+<style>
+	.MyHeader-page {
+        width: 750px;
+		height: 160px;
+        display: flex;
+        position: fixed;
+        top: 0px;
+        z-index: 666;
+	}
+	.head {
+		width: 750px;
+		margin-top: 88px;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		background: #eee;
+	}
+	.title-con {
+		flex-grow: 1;
+		display: flex;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		whitewhite-space: nowrap;
+		align-items: center;
+		justify-content: center;
+		margin-left: 30px;
+	}
+	.title {
+		font-size: 36px;
+		font-weight: bold;
+	}
+	.header-close {
+		height: 30px;
+		width: 30px;
+		position: absolute;
+		right: 30px;
+		top: 10px;
+	}
+</style>

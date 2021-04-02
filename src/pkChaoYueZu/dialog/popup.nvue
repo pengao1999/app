@@ -1,0 +1,206 @@
+<template>
+	<view class="mask">
+		<view class="content fade-in">
+			<text class="title" :style="titleStyle">{{title}}</text>
+			<text v-if="desc!=''" class="desc">{{desc}}</text>
+			<image class="pic" v-if="pic!=''" :src="pic"></image>
+			<view class="bottton-group" v-if="buttonType=='chooser'">
+				<button class="nvue-button" @click="back">取消</button>
+				<view class="button-line"></view>
+				<button class="nvue-button" @click="clickConfirm">
+					<text style="color: #1677FF;">确定</text>
+				</button>
+			</view>
+			<view class="bottton-group" style="border-top-width: 0px;" v-if="buttonType=='single'">
+				<div class="cu-btn btn round"><text class="text-white" style="color: #FFFFFF;" @click="clickConfirm()">保存二维码至相册</text></div>
+			</view>
+		</view>
+		<image class="close-dialog" v-if="showClose" src="/static/zulin/close-dialog.png" @click="back()"></image>
+	</view>
+</template>
+
+<script>
+	import Toast from '../../common/js/toast.js'
+	import Util from '../../common/js/util.js'
+	export default {
+		data() {
+			return {
+				title: "",
+				desc: "",
+				page: "",
+				pic: "",
+				titleStyle: "",
+				buttonType: "chooser",
+				showClose: false
+			}
+		},
+		mixins: [Toast],
+		onLoad(options) {
+			let dialogData = uni.getStorageSync("dialogData")
+			console.log(dialogData)
+			this.title = dialogData.title
+			if (Util.containsKey(dialogData, "desc")) {
+				this.desc = dialogData.desc
+			}
+			if (Util.containsKey(dialogData, "pic")) {
+				this.pic = dialogData.pic
+			}
+			if (Util.containsKey(dialogData, "titleStyle")) {
+				this.titleStyle = dialogData.titleStyle
+			}
+			if (Util.containsKey(dialogData, "buttonType")) {
+				this.buttonType = dialogData.buttonType
+			}
+			if (Util.containsKey(dialogData, "showClose")) {
+				this.showClose = dialogData.showClose
+			}
+			this.page = dialogData.page
+		},
+		methods: {
+			onClick(e) {
+				uni.showToast({
+					title: "点击蒙层关闭"
+				})
+				// #ifdef APP-NVUE
+				e.stopPropagation()
+				// #endif
+			},
+			back() {
+				uni.navigateBack()
+			},
+			clickConfirm() {
+				let self = this
+				if (self.page === 'savePic') {
+					uni.saveImageToPhotosAlbum({
+						filePath: self.pic,
+						success: function () {
+							self.toast({
+								desc: '保存成功'
+							})
+							setTimeout(()=>{
+								self.back()
+							}, 1000)
+						},
+						fail: function() {
+							self.toast({
+								desc: '保存失败'
+							})
+						}
+					})
+					return
+				}
+				if (self.page === 'closePage') {
+					uni.navigateBack({
+						delta: 2
+					})
+					return
+				}
+				if (self.page === 'closeDialog') {
+                    uni.navigateBack({
+                        delta: 2
+                    })
+                    return
+                }
+				if (self.page === "call") {
+					uni.makePhoneCall({
+						phoneNumber: self.desc
+					})
+					uni.navigateBack()
+					return
+				}
+				if (self.page === "cancelOrderInDetail") {
+					uni.$emit("cancelOrderInDetail", {})
+					uni.navigateBack()
+					return
+				}
+				if (self.page === "confirmGoods") {
+					uni.$emit("confirmGoods", {})
+					uni.navigateBack()
+					return
+				}
+				uni.redirectTo({
+					url: self.page
+				})
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.mask {
+		position: fixed;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		justify-content: center;
+		align-items: center;
+		background-color: rgba(0, 0, 0, 0.4);
+	}
+
+	.content {
+		width: 540upx;
+		background-color: #FFFFFF;
+		padding: 0 20upx;
+		border-radius:4px;
+		/* #ifndef APP-NVUE */
+		display: flex;
+		/* #endif */
+		align-items: center;
+	}
+
+	.title {
+		color: #000000;
+		margin-top: 40upx;
+		font-size: 40upx;
+	}
+	.desc {
+		color: #888888;
+		margin-top: 30upx;
+		font-size: 32upx;
+		margin-bottom: 150upx;
+		text-align: center;
+		line-height: 40upx;
+	}
+	.pic {
+		width: 400upx;
+		height: 400upx;
+		margin-bottom: 150upx;
+		margin-top: 30upx;
+	}
+	.bottton-group {
+		width: 540upx;
+		height: 100upx;
+		position: absolute;
+		bottom: 0upx;
+		border-top-color:#E5E5E5;
+		border-top-width: 1px;
+		display: row;
+		flex-direction: row;
+	}
+	.nvue-button {
+		width: 269upx;
+		background-color: #FFFFFF;
+		border-width: 0px;
+	}
+	.button-line {
+		width: 2upx;
+		background-color: #E5E5E5;
+		height: 100upx;
+	}
+	.btn {
+		width: 460upx;
+		height: 80upx;
+		margin-left: 40upx;
+		background-color: #1677FF;
+		color: white;
+	}
+	.close-dialog {
+		margin-top: 50upx;
+		width: 60upx;
+		height: 60upx;
+	}
+</style>

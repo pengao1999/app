@@ -1,0 +1,132 @@
+/**
+ * @file Project common animation
+ * @author <author>
+ */
+/** 不停旋转*/
+.rotate-forever {
+  animation: rotate-forever 2s linear;
+  animation-iteration-count: infinite;
+}
+
+@-webkit-keyframes rotate-forever {
+  from {
+    -webkit-transform: rotateZ(0);
+  }
+
+  to {
+    -webkit-transform: rotateZ(360deg);
+  }
+}
+
+/**从下向上*/
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.6s;
+}
+
+/**从上向下淡入*/
+.slide-down {
+  animation: slideDown 1s;
+}
+
+@keyframes slideDown {
+  from {
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+    visibility: visible;
+    opacity: 0;
+  }
+  to {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+/**淡入*/
+.fade-in {
+  animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/**淡出*/
+.fade-out {
+  animation: fadeOut 1s;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/**
+ * 从右淡入
+ * 从右淡出
+ */
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active for below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
+
+.bounce-enter-active {
+  animation: bounce-in .5s;
+}
+.bounce-leave-active {
+  animation: bounce-in .5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+.grid{
+	background-image:-webkit-linear-gradient(top,
+					transparent 49px,
+					#bfbebe 50px),
+					-webkit-linear-gradient(left,
+					transparent 49px,
+					#bfbebe 50px);
+ 
+	background-size:50px 50px;
+	background-repeat:repeat;                     /*先画个网格，便于布局*/
+}

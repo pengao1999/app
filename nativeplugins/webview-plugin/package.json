@@ -1,0 +1,20 @@
+{
+	"name":"webview-plugin",
+	"id": "webview-plugin",
+	"version": "1.0.0",
+	"description": "实人认证插件",
+	"_dp_type": "nativeplugin",
+	"_dp_nativeplugin": {
+		"android": {
+			"plugins": [{  
+                    "type":"module", 
+                    "name":"webview-plugin",  
+                    "class": "com.yanxuanbest.plugin.wxModule.WebviewWXModule"  
+                   }],
+			"integrateType": "aar",
+			"minSdkVersion": "16",
+			"hooksClass": "uni.dcloud.io.uniplugin_stepcounter.StepCounterHookProxy"	
+		}
+	}
+   
+}

@@ -1,0 +1,1044 @@
+<template>
+	<view>
+        <common-search v-if="showSearch" :customFormat="searchCustomFormat"></common-search>
+
+        <view class="VerticalBox" :style="'height:'+scrollHeight+'px'">
+			<error-tip  :propData="errorData" @hide="errorHide"></error-tip>
+			<scroll-view class="VerticalNav nav" scroll-y scroll-with-animation :scroll-top="verticalNavTop" style="height:calc(100vh);background:#f8f8f8;"  :style="'height:'+scrollHeight+'px'">
+				<view class="cu-item one-line-dot" :class="index==tabCur&&isShowCur==true?'text-green cur':''" v-for="(item,index) in menuData" :key="index" @tap="setCatId(index)"
+				 :data-id="index" :style="index==tabCur&&isShowCur==true?'color:'+categoryCustomFormat.color:''">
+					{{item.name}}
+				</view>
+				<view v-if="isNewcomers" class="cu-item one-line-dot" :class="isSelectNewcomers==true?'text-green cur':''" @tap="catSelect()" >
+					新人专享
+				</view>
+			</scroll-view>
+			<scroll-view v-if="showRight" class="VerticalMain" scroll-y scroll-with-animation style="height:calc(100vh)" lower-threshold="50" @scrolltolower="isSelectNewcomers==true?getNewcomersGoods(0, currentPage):getGoods(0, currentPage)" :style="'height:'+scrollHeight+'px'">
+				<view class="cu-list menu-avatar" v-if="lists.length>0">
+					<view class="cu-item" style="border-bottom: 1upx solid #eee;" v-for="(item, index) in lists" :style="item.opacityCustom?'opacity:0.7':''" :key="index">
+						<view class="cu-avatar avatar" style="left:20upx;" >
+							<image class="cu-avatar avatar" :lazy-load="true" :src="image_root+item.pic" @tap="toProduct(item,activity_key,activity_endtime)"></image>
+							<view class="sale-out" v-if="item.opacityCustom">{{item.opacityText}}</view>
+						</view>
+
+						<view class="content">
+							<view class="coloum-container " @tap="toProduct(item,activity_key,activity_endtime)">
+								<view class="text-black two-line-dot">{{item.name}}</view>
+								<view class="text-gray text-sm flex">
+									<text class="text-gray">
+										销量:{{item.sales_num}}
+									</text>
+								</view>
+							</view>
+							<view style="width: 220upx;">
+								<text class="text-red" style="font-size: 34upx;font-weight: bold;">¥{{item.price}}</text>
+								<text class="text-gray" style="margin-left: 10upx;text-decoration: line-through;font-size: 24upx;">¥{{item.original_price}}</text>
+							</view>
+						</view>
+						<view class="action bottom" style="height: 100%;">
+							<!-- <view class="cart-container fade-in" v-if="item.showCart" @tap.stop="tryBuy(item, index)">
+								<image class="text-white cart" src="/static/gouwuche.png"></image>
+							</view> -->
+							<view class='buy' v-if="item.showCart || item.cart_num == 0" @tap.stop="tryBuy(item, index)">{{item.stock==0?'已售罄':'加入购物车'}}</view>
+							<view class="add-reduce-container row-container fade-in" v-else>
+								<image class="uni-icon uni-icon-minus-filled btn-container" style="font-size: 24px;color:var(--gray)" @tap.stop="reducePlat(item, index)"></image>
+								<view class="btn-container">{{item.cart_num}}</view>
+								<image  class="uni-icon uni-icon-plus-filled btn-container" style="font-size: 24px;color:#e84118" @tap.stop="addPlat(item, index)"></image>
+							</view>
+						</view>
+					</view>
+					<uni-load-more :loadingType="loadingType" :contentText="contentText"></uni-load-more>
+				</view>
+				<view class="main-center-page" style="background: var(--white);padding-top: 450upx;" v-else>
+					<image class="empty" :lazy-load="true" src="/static/empty.png"></image>
+					<view class="text-gray">该类目下暂无商品～</view>
+				</view>
+			</scroll-view>
+		</view>
+		<!--  #ifdef  MP-WEIXIN || H5 -->
+		<my-wx-login :propData="loginDialogData" @handleClose="handleClose" @getUserInfoSuccess="getUserInfoSuccess" @getUserInfoH5="getUserInfoH5"></my-wx-login>
+		<!--  #endif -->
+		<service-center-dialog :showPositionDialog="showCenterDialog" @enter="toArea"></service-center-dialog>
+		<product-selector :propData="selectorData" @close="closeSelector" @reduce="reduceNum" @add="addNum" @submit="submit" @selectAttrItem="selectAttrItem"></product-selector>
+	</view>
+</template>
+
+<script>
+	import Config from '@/common/js/Config.js'
+	import Toast from '@/common/js/toast.js'
+	import Auth from '../auth.js'
+	import Cart from '../cartsResfresh.js'
+	import Util from '../../common/js/util.js'
+
+	import UniLoadMore from '../../components/uni-load-more.vue'
+	import ServiceCenterDialog from '../../components/yx_dialog/myServiceCenterDialog.vue'
+	import ProductSelector from '../../components/yx_dialog/myProductSelector.vue'
+	import UniIcon from '../../components/uni-icon.vue'
+    import ErrorTip from '../../components/yx_dialog/myErrorTip.vue'
+    import CommonSearch from './components/CommonSearch.vue'
+    import {mapMutations} from 'vuex'
+    import * as categoryPageCustomization from "@/pages/customization/category-page-customization.json";
+
+	const CURRENT_CAT_TYPE = 0;
+	const NEXT_CATE_TYPE = 2;
+	export default {
+		data() {
+			return {
+				shouldReload: false, //是否需要重新加载
+				menuData: [],  //左侧菜单列表
+				lists: [], //商品列表
+				image_root: '', //图片地址
+				tabCur: 0, //当前选中菜单下标
+				verticalNavTop: 0, //菜单根据用户点击自动滑动，该值为菜单列表滑动距离
+				catType: CURRENT_CAT_TYPE, //正在抢购
+				currentPage: 1, //商品列表下次加载页码
+				loadingType: 1, //加载提示语下标
+				contentText: {
+					contentdown: "上拉显示更多",
+					contentrefresh: "正在加载...",
+					contentnomore: "没有更多数据了"
+				}, //加载提示语
+				loadingPageSuccess: true, //是否加载数据成功，防止多次加载
+				showCenterDialog: false, //是否显示运营中心弹窗
+				showRight: false,
+				activity_key:0, //活动id
+				activity_endtime:0, //活动结束时间
+				selectorData: {
+					show: false
+				}, //商品选择器，当商品存在多规格时弹出
+				selectorIdx: 0,//选择器对应商品列表商品下标
+				// 错误提示
+				errorData: {
+					show: false,
+					desc: ''
+				},
+				mapLists: new Map(),
+				isToProduct: false,
+				isError: false,
+				isSelectNewcomers:false,
+				isShowCur:true,
+				loginDialogData: {
+					show: false
+                },
+                showSearch: false,
+                searchCustomFormat: {},
+                categoryCustomFormat: {}
+			};
+		},
+		watch: {
+			acts: {
+				handler() {
+					if (this.acts !== undefined) {
+						this.activity_key = this.acts.activity_key
+						this.activity_endtime = this.acts.end_time
+					}
+				},
+				immediate: true
+			},
+			tabCur: {
+				handler() {
+					if (this.menuData.length > 0) {
+					}
+				},
+				immediate: true
+			},
+			catId: {
+				handler(newest, old) {
+					let self = this
+					if (this.menuData.length > 0) {
+						if(this.isNewcomersPage!=1){
+							self.TabSelect(newest)
+						}
+
+					}
+				},
+				immediate: true
+			},
+			menuData: {
+				handler() {
+					if (this.menuData.length > 0) {
+						this.TabSelect(this.catId)
+					}
+				},
+				immediate: true
+			},
+			refreshCategoryGoodList: {
+				handler() {
+					if (this.refreshCategoryGoodList.length > 0) {
+						this.refreshCartNum()
+					}
+				},
+				immediate: true
+			},
+			isNewcomersPage: {
+				handler() {
+				},
+				immediate: true
+			},
+			isNewcomers: {
+				handler() {
+				},
+				immediate: true
+			},
+			userInfo: {
+				handler(newest, old) {
+					if ((this.userInfo === undefined)
+						|| (this.userInfo != undefined && !Util.containsKey(this.userInfo, 'user_key'))) {
+					} else {
+						if (Util.containsKey(newest, 'user_key') && !Util.containsKey(old, 'user_key')){
+							this.lists = []
+							this.mapLists = new Map()
+							this.currentPage = 1
+							this.loadingType = 1
+							this.getGoods(CURRENT_CAT_TYPE, this.currentPage)
+						}
+						this.loginDialogData = Object.assign({}, this.loginDialogData, {
+							show: false
+						})
+					}
+					if (this.userInfo != undefined && Util.containsKey(this.userInfo, 'user_key')) {
+						this.resfreshCartNum(this.userInfo.user_key, (res)=>{})
+					}
+				},
+				immediate: true
+			},
+		},
+		mixins: [Toast, Auth, Cart],
+		components: {
+			UniLoadMore, ServiceCenterDialog, UniIcon, ProductSelector, ErrorTip, CommonSearch
+		},
+		onLoad() {
+			let self = this
+            if (!self.checkLogin()) return //判断是否登录
+
+            self.showSearch = !!categoryPageCustomization['search']
+            if(categoryPageCustomization['search']){
+                self.searchCustomFormat = categoryPageCustomization['search']['format']
+            }
+            if(categoryPageCustomization['categoryList']){
+                self.categoryCustomFormat = categoryPageCustomization['categoryList']['format']
+            }
+
+			self.getClassify();
+			setTimeout(()=> {
+				self.showRight = true
+			}, 100)
+			uni.getSystemInfo({
+			    success: function (res) {
+					self.scrollHeight=res.windowHeight-43
+			    }
+			});
+		},
+		onShow() {
+			if (this.shouldReload) {
+				this.shouldReload = false
+				this.getClassify()
+			}
+			if (this.refreshCart && Util.containsKey(this.userInfo, 'user_key')) {
+				this.resfreshCartNum(this.userInfo.user_key, (res)=>{})
+			}
+			if (this.isNewcomersPage==1) {
+				console.log('isNewcomersPage=1')
+				this.setNewPageTag()
+				this.catSelect()
+			}
+		},
+		onReady() {
+			uni.hideLoading()
+		},
+		computed: {
+			globalI() {
+				return this.$store.state.globalI
+			},
+			group() {
+				return this.$store.state.group
+			},
+			catId() {
+				return this.$store.state.catId
+			},
+			acts() {
+				return this.$store.state.acts
+			},
+			userInfo() {
+				return this.$store.state.userInfo
+			},
+			refreshCategoryGoodList() {
+				return this.$store.state.refreshCategoryGoodList
+			},
+			refreshCart() {
+				return this.$store.state.refreshCart
+			},
+			isNewcomersPage() {
+				return this.$store.state.isNewcomersPage
+			},
+			isNewcomers() {
+				return this.$store.state.isNewcomers
+			}
+		},
+		methods: {
+			...mapMutations(['setCatId', 'setRefreshCart', 'emptyCategoryRefresh', 'addIndexRefresh', 'setInChooseProductCartNum','setIsNewcomersPage', 'setLoginWx', 'setUserInfo']),
+			/**
+			 * 重置分类
+			 */
+			changeClassify:function(){
+				// this.menuData=[{ //分类类别
+				// 	name: '全部商品',
+				// 	id: '0',
+				// 	recommend: 0
+				// }]
+				this.menuData=[]
+				this.getClassify();
+			},
+			getClassify: function() {
+				let self = this
+				// if (self.$cache.get('classify', false)) {
+				// 	// self.cTabBars = self.$cache.get('classify', false) || []
+				// 	self.menuData = self.$cache.get('classify', false) || []
+				// 	self.setCatId(0)
+				// 	return
+				// }
+				self.$http.post(Config.URLS.classify, {}).then((res) => {
+						res = res.data
+						if (res.code === 0)
+						// this.menuData=[{ //分类类别
+						// 	name: '全部商品',
+						// 	id: '0',
+						// 	recommend: 0
+						// }]
+						self.menuData=[]
+						// self.cTabBars = self.cTabBars.concat(res.data)
+						res.data.forEach((item, index) => {
+							// item.cate_img = img_root + item.cate_img
+							if (item.name === '全部商品') {
+								item.category_key = 0
+							}
+
+							self.menuData.push(item)
+						})
+						// self.menuData = self.menuData.concat(res.data)
+						self.setCatId(0)
+						self.$cache.put('classify', self.menuData, Config.CACHE_TIMEOUT)
+					})
+			},
+			getGoods: function(catType = CURRENT_CAT_TYPE, page = 1) {
+				let self = this
+				if (!self.loadingPageSuccess) return
+				if (self.loadingType === 2) return
+				self.loadingPageSuccess = false
+				console.log(self.menuData)
+				let data = {
+					i:self.globalI,
+					act_type:catType,
+					page: page,
+					limit: Config.PAGE_LIMIT,
+					cat_key: self.menuData.length > 0 ? self.menuData[self.tabCur].category_key : '',
+					user_key: Util.containsKey(self.userInfo, 'user_key') ? self.userInfo.user_key : ''
+				}
+				self.$http.post(Config.URLS.getGoods, data).then((res) => {
+						self.toast(true)
+						uni.stopPullDownRefresh()
+						self.loadingPageSuccess = true
+						res = res.data
+
+						if (res.data.goods.length < Config.PAGE_LIMIT) {
+							self.loadingType = 2
+						} else {
+							self.loadingType = 0
+						}
+						self.image_root=res.other.img_root
+						let lists = res.data.goods
+						lists.forEach((item, index) => {
+							item.opacityCustom = false
+							if (item.cart_num > 0) {
+								item.showCart = false
+							} else {
+								item.showCart = true
+							}
+
+							if (item.stock === 0) {
+								item.opacityCustom = true
+								item.opacityText = '已抢光'
+							}
+							if (item.goods_begin_time > (new Date()).getTime()/1000) {
+								item.opacityCustom = true
+								item.opacityText = '活动未开始'
+							}
+							if (item.end_time2 < (new Date()).getTime()/1000) {
+								item.opacityCustom = true
+								item.opacityText = '活动已结束'
+							}
+
+							self.lists.push(item)
+							self.mapLists.set(item.id, self.lists.length - 1)
+						})
+						for(var i=0; i<3; i++) {
+							setTimeout(()=>{
+								self.lists = Object.assign([], self.lists)
+							}, 100)
+						}
+						self.currentPage ++;
+					}).catch(err => {
+						self.loadingPageSuccess = true
+						if (self.isError) return
+						self.isError = true
+						uni.showModal({
+							title: '温馨提示',
+							content: '抱歉，获取商品信息失败，请检查网络！',
+							showCancel: false,
+							comfirmText: '重试',
+							success: (res) => {
+								self.getGoods(catType, page)
+							}
+						})
+					})
+			},
+			getNewcomersGoods: function(catType = CURRENT_CAT_TYPE, page = 1) {
+				let self = this
+				return
+				if (!self.loadingPageSuccess) return
+				if (self.loadingType === 2) return
+				self.loadingPageSuccess = false
+				let data = {
+					i:self.globalI,
+					act_type:catType,
+					page: page,
+					limit: Config.PAGE_LIMIT,
+					latitude: self.group.latitude,
+					longitude: self.group.longitude,
+					cat_key: 0,
+					user_key: self.userInfo.user_key
+				}
+				self.$http.post(Config.URLS.newcomersList, data).then((res) => {
+						self.toast(true)
+						uni.stopPullDownRefresh()
+						self.loadingPageSuccess = true
+						res = res.data
+						if (res.data.goods.length < Config.PAGE_LIMIT) {
+							self.loadingType = 2
+						} else {
+							self.loadingType = 0
+						}
+						self.image_root=res.other.img_root
+						let lists = res.data.goods
+						lists.forEach((item, index) => {
+							item.opacityCustom = false
+							if (item.cart_num > 0) {
+								item.showCart = false
+							} else {
+								item.showCart = true
+							}
+
+							if (item.stock === 0) {
+								item.opacityCustom = true
+								item.opacityText = '已抢光'
+							}
+							if (item.goods_begin_time > (new Date()).getTime()/1000) {
+								item.opacityCustom = true
+								item.opacityText = '活动未开始'
+							}
+							if (item.end_time2 < (new Date()).getTime()/1000) {
+								item.opacityCustom = true
+								item.opacityText = '活动已结束'
+							}
+
+							self.lists.push(item)
+							console.log('aaaaaaa')
+							console.log(self.lists.length)
+							self.mapLists.set(item.id, self.lists.length - 1)
+						})
+						for(var i=0; i<3; i++) {
+							setTimeout(()=>{
+								console.log('bbb')
+								self.lists = Object.assign([], self.lists)
+								console.log(self.lists.length)
+							}, 100)
+						}
+						self.currentPage ++;
+					}).catch(err => {
+						self.loadingPageSuccess = true
+						if (self.isError) return
+						self.isError = true
+						uni.showModal({
+							title: '温馨提示',
+							content: '抱歉，获取商品信息失败，请检查网络！',
+							showCancel: false,
+							comfirmText: '重试',
+							success: (res) => {
+								self.getNewcomersGoods(catType, page)
+							}
+						})
+					})
+			},
+			toArea: function() {
+				uni.navigateTo({
+					url: '/pkUserInfo/address/area?page=1'
+				})
+			},
+			setNewPageTag:function(){
+				let self = this
+				self.setIsNewcomersPage(0)
+			},
+			toProduct: function(good,activity_key,activity_endtime) {
+				let self = this
+				if (self.isToProduct) return
+				self.isToProduct = true
+				setTimeout(()=> {
+					self.isToProduct = false
+				}, 800)
+				self.setInChooseProductCartNum(good.cart_num)
+				uni.navigateTo({
+					url: '/pages/index/product_new?id='+good.id+"&activity_key="+activity_key+"&activity_endtime="+activity_endtime
+				})
+			},
+			tryBuy: function(item, index) {
+				let self = this
+				if ( !this.isLogin() ) return
+				if (item.attrgroups.length > 0) {
+					self.selectorIdx = index
+					self.buy(item)
+				} else {
+					if (!this.checkLogin()) return //判断是否登录
+					if ( !this.isGoodAvailable(item) ) return
+					self.addCart(item, index)
+				}
+			},
+			addCart: function(item, index) {
+				let self = this
+				self.toast({
+					type: 'loading',
+					desc: '加载中...',
+				})
+				let data = {
+					i:self.globalI,
+					user_key: self.userInfo.user_key,
+					goods_key: item.goods_key,
+					activity_key:self.activity_key,//活动id
+					activity_endtime:self.activity_endtime,//活动结束时间
+					store_key: 0,
+					num: 1,
+					token: self.userInfo.access_token,
+					attr_keys: '',
+					attr_names: ''
+				}
+				self.$http.post(Config.URLS.joinCart, data).then((res) => {
+						res = res.data
+						if (res.code === 0) {
+							self.setRefreshCart(true)
+							self.toast({
+								desc: '已加入购物车',
+								type: 'success',
+								time: 1500
+							})
+							self.lists[index].cart_num = 1
+							self.addIndexRefresh({
+								goods_key : item.goods_key,
+								cart_num: 1,
+								cart_key  : res.data
+							})
+							self.lists[index].cart_key = res.data
+							self.lists[index].showCart = false
+							for(var i=0; i<3; i++) {
+								setTimeout(()=>{
+									self.lists[index].showCart = false
+								}, 100)
+							}
+						}else{
+							self.toast({
+								desc: res.msg,
+								type: 'warn',
+								time: 3000
+							})
+						}
+						self.resfreshCartNum(self.userInfo.user_key, (res)=>{})
+					})
+			},
+			buy: function(item) {
+				let self = this
+				if (item.stock === 0) {
+					self.toast({
+						desc: '已售罄,刷新重试'
+					})
+					return
+				}
+				self.selectorData = Object.assign({}, item, {
+					show : true,
+					image_root: self.image_root,
+					num: 1,
+				})
+				setTimeout(()=>{
+					self.selectorData = Object.assign({}, self.selectorData)
+				}, 200)
+				self.selectorData.origin_id = item.id
+				self.retSetAttrGroupStatus()
+				if (self.selectorData.attrgroups.length > 0) {
+					self.selectAttrItem()
+				}
+			},
+			retSetAttrGroupStatus: function() {
+				let self = this
+				self.selectorData.attrgroups.forEach((item, i) => {
+					item.attrs.forEach((attr, j) => {
+						if (j===0) {
+							self.selectorData.attrgroups[i].attrs[j] = Object.assign({}, self.selectorData.attrgroups[i].attrs[j], {
+								status: true
+							})
+							self.selectorData.attrgroups[i].selectAttrsId = j
+						} else {
+							self.selectorData.attrgroups[i].attrs[j] = Object.assign({}, self.selectorData.attrgroups[i].attrs[j], {
+								status: false
+							})
+						}
+					})
+				})
+			},
+			setAttrGroupStatus: function(groups_idx, attrs_idx) {
+				let self = this
+				self.selectorData.attrgroups[groups_idx].attrs[attrs_idx].status = true
+				self.selectorData.attrgroups[groups_idx].selectAttrsId = attrs_idx
+				self.selectorData.attrgroups[groups_idx].attrs.forEach((item, index) => {
+					if (index !== attrs_idx) {
+						self.selectorData.attrgroups[groups_idx].attrs[index].status = false
+					}
+				})
+			},
+			selectAttrItem: function(data) {
+				let self = this
+				self.toast({
+					type: 'loading',
+					desc: '加载中...'
+				})
+				if (data !== undefined && data.groups_idx!==undefined && data.attrs_idx!==undefined)
+					self.setAttrGroupStatus(data.groups_idx, data.attrs_idx)
+
+				var attr_keys = ','
+				var chooseSpec = ''
+				self.selectorData.attrgroups.forEach((item, idx) => {
+					attr_keys += item.attrs[item.selectAttrsId].attr_keys + ','
+					chooseSpec += item.attrs[item.selectAttrsId].name + " "
+				})
+				let postData = {
+					i:self.globalI,
+					attr_keys : attr_keys,
+					goods_key : self.selectorData.goods_key,
+				}
+				self.$http.post(Config.URLS.getGoodAttrs, postData).then((res) => {
+						self.toast(true)
+						res = res.data
+						if (res.code === 0) {
+							self.selectorData = Object.assign({}, self.selectorData, res.data[0], {
+								chooseSpec: chooseSpec,
+								attr_keys: attr_keys,
+								attr_names: chooseSpec
+							})
+						}
+					})
+			},
+			closeSelector: function() {
+				this.selectorData.show = false
+			},
+			reduceNum: function() {
+				if (this.selectorData.num > 1) {
+					this.selectorData.num--;
+				} else {
+					this.toast({
+						type: 'warn',
+						desc: '商品不得少于1件'
+					})
+				}
+			},
+			addNum: function() {
+				if (this.selectorData.num < this.selectorData.stock) {
+					this.selectorData.num++;
+				} else {
+					this.toast({
+						type: 'warn',
+						desc: '商品库存不足'
+					})
+				}
+			},
+			submit: function() {
+				let self = this
+				if (!this.checkLogin()) return //判断是否登录
+				if ( !this.isAvailable() ) return
+				self.toast({
+					type: 'loading',
+					desc: '加载中...',
+				})
+				let data = {
+					user_key: self.userInfo.user_key,
+					goods_key: self.selectorData.goods_key,
+					store_key: 0,
+					activity_key:this.activity_key,//活动id
+					activity_endtime:this.activity_endtime,//活动
+					num: self.selectorData.num,
+					token: self.userInfo.access_token,
+					attr_keys: self.selectorData.attr_keys === undefined?'':self.selectorData.attr_keys,
+					attr_names: self.selectorData.chooseSpec === undefined?'':self.selectorData.chooseSpec
+				}
+				self.$http.post(Config.URLS.joinCart, data).then((res) => {
+						res = res.data
+						if (res.code === 0) {
+							self.setRefreshCart(true)
+							self.toast({
+								desc: '已加入购物车',
+								type: 'success',
+								time: 3000
+							})
+							self.lists[self.selectorIdx].cart_num ++
+							self.addIndexRefresh({
+								goods_key : self.selectorData.goods_key,
+								cart_num: self.lists[self.selectorIdx].cart_num,
+								cart_key  : res.data
+							})
+							self.lists[self.selectorIdx].cart_key = res.data
+							self.lists[self.selectorIdx].showCart = false
+							self.selectorData.show = false
+						} else {
+							self.toast({
+								desc: res.msg,
+								type: 'warn',
+								time: 3000
+							})
+						}
+						self.resfreshCartNum(this.userInfo.user_key, (res)=>{})
+					})
+			},
+			isGoodAvailable: function(item) {
+				let self = this
+				var totalSecond = item.end_time2 - Date.parse(new Date()) / 1000;
+				if (totalSecond<=0){
+					self.toast({
+						type: 'warn',
+						desc: '活动已结束'
+					})
+					return false
+				}
+				if (item.stock < 1) {
+					self.toast({
+						type: 'warn',
+						desc: '库存不足'
+					})
+					return false
+				}
+
+				if ((new Date()).getTime()/1000 < item.goods_begin_time) {
+					self.toast({
+						type: 'warn',
+						desc: '活动未开始'
+					})
+					return false
+				}
+				if ((new Date()).getTime()/1000 > item.end_time2) {
+					self.toast({
+						type: 'warn',
+						desc: '活动已结束'
+					})
+					return false
+				}
+				return true
+			},
+			isAvailable: function() {
+				let self = this
+				var totalSecond = this.selectorData.end_time2 - Date.parse(new Date()) / 1000;
+				if (totalSecond<=0){
+					self.toast({
+						type: 'warn',
+						desc: '活动已结束'
+					})
+					return false
+				}
+				if (this.selectorData.stock < 1) {
+					self.toast({
+						type: 'warn',
+						desc: '库存不足'
+					})
+					return false
+				}
+
+				if ((new Date()).getTime()/1000 < this.selectorData.goods_begin_time) {
+					self.toast({
+						type: 'warn',
+						desc: '活动未开始'
+					})
+					return false
+				}
+				if ((new Date()).getTime()/1000 > this.selectorData.end_time2) {
+					self.toast({
+						type: 'warn',
+						desc: '活动已结束'
+					})
+					return false
+				}
+				return true
+			},
+			reducePlat: function(item, idx) {
+				let self = this
+				if (item.attrgroups.length > 0) {
+					self.errorData = Object.assign({
+						show: true,
+						desc: '多规格商品只能去购物车移除'
+					})
+					return
+				}
+
+				if (!this.checkLogin()) return //判断是否登录
+				if ( !this.isGoodAvailable(item) ) return
+				self.updateCart(item.id, item.cart_key, item.cart_num-1, idx)
+			},
+			updateCart: function(goods_key, cart_key, num, idx) {
+				let self = this
+				self.toast({
+					type: 'loading',
+					desc: '处理中...'
+				})
+				let data = {
+					user_key: self.userInfo.user_key,
+					token: self.userInfo.access_token,
+					cart_key: cart_key,
+					num: num
+				}
+				self.$http.post(Config.URLS.updateCart, data).then((res) => {
+						self.toast(true)
+						res = res.data
+						if (res.code === 0) {
+							self.setRefreshCart(true)
+							if (num === 0) {
+								self.toast({
+									type: 'success',
+									desc: '已移除购物车'
+								})
+								self.lists[idx].cart_num = 0
+								self.lists[idx].showCart = true
+								for (var i=0; i<3; i++) {
+									setTimeout(()=>{
+										self.lists[idx].showCart = true
+									}, 100)
+								}
+								self.addIndexRefresh({
+								goods_key : goods_key,
+								cart_num: 0
+							})
+							} else {
+								self.lists[idx].cart_num = num
+								self.addIndexRefresh({
+								goods_key : goods_key,
+								cart_num: num
+							})
+							}
+						} else {
+							self.toast({
+								type: 'warn',
+								desc: '库存不足'
+							})
+						}
+						self.resfreshCartNum(self.userInfo.user_key, (res)=>{})
+					})
+			},
+			addPlat: function(item, idx) {
+				let self = this
+				if (item.attrgroups.length > 0) {
+					self.selectorIdx = idx
+					self.buy(item)
+					return
+				}
+
+				if (!this.checkLogin()) return //判断是否登录
+				if ( !this.isGoodAvailable(item) ) return
+				self.updateCart(item.id, item.cart_key, item.cart_num+1, idx)
+			},
+			catSelect:function() {
+				this.isSelectNewcomers=true
+				this.isShowCur=false
+				this.verticalNavTop = (this.menuData.length - 1) * 50
+				this.toast({
+					desc: '加载中',
+					type: 'loading'
+				})
+				this.lists = []
+				this.mapLists = new Map()
+				this.currentPage = 1
+				this.loadingType = 1
+				this.getNewcomersGoods(CURRENT_CAT_TYPE, this.currentPage)
+			},
+			TabSelect(id) {
+				this.isShowCur=true
+				this.tabCur = id;
+				this.verticalNavTop = (id - 1) * 50
+				this.isSelectNewcomers=false;
+				this.toast({
+					desc: '加载中',
+					type: 'loading'
+				})
+
+				this.lists = []
+				this.mapLists = new Map()
+				this.currentPage = 1
+				this.loadingType = 1
+				this.getGoods(CURRENT_CAT_TYPE, this.currentPage)
+			},
+			// 错误隐藏
+			errorHide: function (e) {
+			    if (!e.detail) {
+			        this.errorData.show = false;
+			        return
+			    }
+			    this.errorData = e.detail
+			},
+			refreshCartNum: async function() {
+				let self = this
+				if (self.lists.length === 0) {
+					self.emptyCategoryRefresh()
+					return
+				}
+				self.refreshCategoryGoodList.forEach((item, index) => {
+					item.multi ? item.cart_num = self.lists[self.mapLists.get(parseInt(item.goods_key))].cart_num  + item.cart_num : null;
+					if (item.cart_num > 0) {
+						self.lists[self.mapLists.get(parseInt(item.goods_key))].cart_num = item.cart_num
+						self.lists[self.mapLists.get(parseInt(item.goods_key))].showCart = false
+						item.cart_key ? self.lists[self.mapLists.get(parseInt(item.goods_key))].cart_key = item.cart_key: null
+					} else {
+						self.lists[self.mapLists.get(parseInt(item.goods_key))].cart_num = 0
+						self.lists[self.mapLists.get(parseInt(item.goods_key))].showCart = true
+					}
+				})
+				self.emptyCategoryRefresh()
+			},
+			getUserInfoSuccess: function(userInfo) {
+				this.setUserInfo(userInfo)
+				this.setLoginWx(true)
+			},
+			getUserInfoH5: function() {
+				this.setLoginWx(true)
+			},
+			handleClose: function() {
+				this.loginDialogData.show = false
+			},
+			isLogin: function() {
+				// #ifdef MP-WEIXIN || H5
+				if (this.userInfo === undefined || !Util.containsKey(this.userInfo, 'user_key')) {
+					this.loginDialogData = Object.assign({}, this.loginDialogData, {
+						show: true
+					})
+					return false
+				}
+				// #endif
+				return true
+			},
+			toSearch: function() {
+				uni.navigateTo({
+					url: '/pkMain/goodslist/goodslist'
+				})
+			},
+		},
+		onPullDownRefresh() {
+			if (this.group !== undefined && this.group !== '') {
+				this.TabSelect(this.tabCur)
+			}
+		}
+	}
+</script>
+
+<style>
+	@import url("../../common/css/animation.css");
+	@import url("../../common/css/colorui.css");
+	@import url("../../common/css/common.css");
+
+	.VerticalNav.nav {
+		width: 200upx;
+		white-space: initial;
+		border-right: 1upx solid #F8F8F8;
+	}
+
+	.VerticalNav.nav .cu-item {
+		width: 100%;
+		text-align: center;
+		margin: 0;
+		border: none;
+		height: 50px;
+		line-height: 50px;
+		position: relative;
+	}
+
+	.VerticalNav.nav .cu-item.cur::after {
+		content: "";
+		width: 8upx;
+		height: 30upx;
+		border-radius: 10upx 0 0 10upx;
+		position: absolute;
+		background-color: currentColor;
+		top: 0;
+		right: 0upx;
+		bottom: 0;
+		margin: auto;
+	}
+	.avatar {
+		width: 150upx;
+		height: 150upx;
+		border-radius: 20upx;
+	}
+	.bottom {
+		display: flex;
+		align-items: flex-end;
+	}
+	.cart-container {
+		width: 60upx;
+		height: 60upx;
+		line-height: 60up;
+		border-radius: 50%;
+		background: var(--main);
+		align-items:center;
+		justify-content:center;
+		display:flex;
+		margin-left: 70upx;
+	}
+	.empty {
+		width: 100upx;
+		height: 80upx;
+	}
+	.cart-container .cart {
+		width: 32upx;
+		height: 32upx;
+	}
+	.btn-container {
+		width: 50upx;
+		height: 50upx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+	}
+	.VerticalBox {
+		display: flex;
+	}
+	.fixed-height-150 {
+		height: 150upx;
+	}
+
+	.VerticalMain {
+		background-color: white;
+		flex: 1;
+	}
+	.buy {
+		width: 140rpx;
+		height: 50rpx;
+		line-height: 50rpx;
+		background: #e84118;
+		border-radius: 25rpx;
+		text-align: center;
+		font-size: 20rpx;
+		color: #fff;
+		font-weight: 500;
+	}
+	.sale-out {
+		width: 130upx;
+		height: 130upx;
+		border-radius: 50%;
+		color: white;
+		background: black;
+		opacity: 0.7;
+		text-align: center;
+		line-height: 150upx;
+		position: absolute;
+		font-size: 24upx;
+	}
+</style>
