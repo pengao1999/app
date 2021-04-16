@@ -977,7 +977,7 @@
 							json[item.name] = item.item[self.subIndex[index]].name
 						})
 						self.goods.attr_json = json
-						self.goods.attr_names = self.selectArr.join(' ')
+						self.goods.attr_names = self.selectArr.join(' &')
 						self.goods.price = self.selectshop.price
 						self.goods.num = self.selectNum
 						self.goods.rent_code = zuqiCode

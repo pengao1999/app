@@ -541,7 +541,6 @@
 			stepper
 		},
 		onLoad(options) {
-			console.log(options)
 			let self = this;
 			uni.setNavigationBarTitle({
 				title: "商品详情"
@@ -571,7 +570,6 @@
 				handler() {
 					if (!Util.isEmptyObject(this.systemInfo)) {
 						this.windowHeight = this.systemInfo.windowHeight;
-						console.log("windowHeight:" + this.windowHeight);
 					}
 				}
 			}
@@ -588,7 +586,6 @@
 			}
 		},
 		mounted() {
-			console.log(this.goods)
 		},
 		methods: {
 			...mapMutations(['setUserInfo']),
@@ -629,10 +626,8 @@
 				self.$Phttp.get(Config.JAVA_SAAS_URLS.getAssociation, param).then(res => {
 					res = res.data
 					if (res.code === 0) {
-						console.log('data', res.data)
 						self.associations = res.data || []
 					}
-					console.log(self.associations, 'associations')
 				})
 			},
 			hideSku() {
@@ -657,7 +652,6 @@
 								}
 							}
 						})
-						console.log('obj', self.collectionObj)
 					}
 				})
 			},
@@ -702,7 +696,6 @@
 				self.$Phttp
 					.post(Config.JAVA_SAAS_URLS.getGoods, data)
 					.then(res => {
-						console.log(res)
 						self.toast(true);
 						res = res.data;
 						if (res.code === 0) {
@@ -744,7 +737,6 @@
 									}
 								})
 							}
-							console.log(self.goods, 'goods')
 							// self.specifications = res.data.attrgroups
 							// console.log('spec', self.specifications)
 						}
@@ -819,7 +811,6 @@
 				return isOk
 			},
 			toOrder: function() {
-				console.log('aaa')
 				let self = this
 				if (!self.hasRegister()) return;
 				if (!this.hasBindTel()) return
@@ -829,7 +820,6 @@
 					skuGoodsPrice: self.selectshop.origin_price ? self.selectshop.origin_price : self.goods.original_price ? self.goods
 						.original_price : ''
 				}
-				console.log(data)
 				if (!self.checkSelectArr()) {
 					self.toast({
 						desc: '请完成规格选取'
@@ -1055,11 +1045,9 @@
 					target_key: self.key,
 					user_key: self.userInfo.user_key
 				}
-				console.log('data', data)
 				self.$Phttp.post(Config.JAVA_SAAS_URLS.upsertCollection, data).then(res => {
 					res = res.data
 					if (res.code === 0) {
-						console.log(res.data)
 						self.collectionObj = {
 							isCollected: true,
 							collectKey: res.data.collect_key,
@@ -1133,7 +1121,6 @@
 							this.$set(this.specifications[i].item[j], 'ishow', false);
 						}
 					}
-					console.log(this.specifications, 'specifications')
 				}
 				// console.timeEnd('筛选可选路径需要的时间是');
 			},
@@ -1143,11 +1130,9 @@
 			chooseDefault() {
 				let self = this
 				let difference = self.difference[0].difference
-				console.log("difference:" + JSON.stringify(difference) + ",specifications:" + self.specifications.length)
 				self.specifications.forEach((type, tIndex) => {
 					type.item.forEach((attr, aIndex) => {
 						if (difference[tIndex] === attr.name) {
-							console.log("click:" + JSON.stringify(attr))
 							self.skuClick(attr, tIndex, null, aIndex)
 						}
 					})
@@ -1166,8 +1151,6 @@
 				}
 			},
 			skuClick(value, index1, event, index2) {
-				console.log("skuClick")
-				console.log(value)
 				if (value.ishow) {
 					if (this.selectArr[index1] != value.name) {
 						this.$set(this.selectArr, index1, value.name);
@@ -1180,14 +1163,10 @@
 						this.periodsConfig.periods = value.periods
 						this.periodsConfig.unit = this.parseUnit(value.unit)
 					}
-					console.log(this.periodsConfig, 'periodsConfig')
 					this.checkInpath(index1);
 					//如果全部选完
 					if (this.selectArr.every(item => item != '')) {
-						console.log("selectArr")
-						console.log(this.selectArr)
 						this.selectshop = this.shopItemInfo[this.selectArr];
-						console.log(this.selectshop, 'selectshop')
 						if (this.selectshop.origin_price === null) {
 							this.selectshop.origin_price = 0
 						}
