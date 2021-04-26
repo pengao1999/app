@@ -977,7 +977,7 @@
 							json[item.name] = item.item[self.subIndex[index]].name
 						})
 						self.goods.attr_json = json
-						self.goods.attr_names = self.selectArr.join(' &')
+						self.goods.attr_names = self.selectArr.join(' ')
 						self.goods.price = self.selectshop.price
 						self.goods.num = self.selectNum
 						self.goods.rent_code = zuqiCode
@@ -990,6 +990,7 @@
 							self.goods.pic = self.colors[self.colorIndex].pic
 							self.goods.attr_names += " " + self.colors[self.colorIndex].name
 						}
+						debugger;
 						uni.setStorageSync("goods", self.goods);
 						uni.setStorageSync("image_root", self.image_root);
 						uni.setStorageSync('cAttr', self.cAttr);
